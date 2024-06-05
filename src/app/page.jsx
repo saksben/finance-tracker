@@ -1,12 +1,6 @@
 "use client";
 
-import { Counter } from "./components/counter/counter";
-
+// Dashboard page
 export default function Home() {
-  return (
-    <main className="">
-      Hello World
-      <Counter />
-    </main>
-  );
+  return <main className="">Hello World</main>;
 }

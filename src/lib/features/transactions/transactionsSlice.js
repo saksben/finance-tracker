@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // Initial state of transactions
 const initialState = [
-    {id: "1", amount: "30", description: "Wal-Mart", type: "expense", category: "groceries"},
-    {id: "2", amount: "500", description: "Paycheck", type: "income", category: "job"},
+    {id: "1", amount: 30, description: "Wal-Mart", type: "expense", category: "groceries"},
+    {id: "2", amount: 500, description: "Paycheck", type: "income", category: "job"},
 ]
 
 // Redux slice pertaining to transactions

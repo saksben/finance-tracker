@@ -46,6 +46,9 @@ p {
   font-size: 1rem
 }
 
+input, option, select {
+  color: black;
+}
 
 @layer utilities {
   .text-balance {

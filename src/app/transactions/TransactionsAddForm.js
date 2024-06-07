@@ -1,17 +1,19 @@
 "use client";
 
 import React from "react";
-import { useDispatch } from "react-redux";
-import {
-  transactionAdded,
-} from "../../lib/features/transactions/transactionsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { transactionAdded } from "../../lib/features/transactions/transactionsSlice";
 import { nanoid } from "@reduxjs/toolkit";
-
-// TODO: let user add categories, and withdraw list of categories from Redux store
+import { useRouter } from "next/navigation";
+import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
 
 // TransactionsAddForm component to add a transaction to the list
 export function TransactionsAddForm() {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const categories = useSelector(selectCategory);
+
+  console.log(categories);
 
   // Format today's date as select element
   const today = new Date();
@@ -24,14 +26,26 @@ export function TransactionsAddForm() {
   const [amount, setAmount] = React.useState(0);
   const [description, setDescription] = React.useState("Transaction");
   const [type, setType] = React.useState("Expense");
-  const [category, setCategory] = React.useState("Test");
+  const [category, setCategory] = React.useState("Gasoline");
 
   // Input change handlers
   const handleDateChange = (e) => setDate(e.target.value);
   const handleAmountChange = (e) => setAmount(e.target.value);
   const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handleTypeChange = (e) => setType(e.target.value);
-  const handleCategoryChange = (e) => setCategory(e.target.value);
+  const handleCategoryChange = (e) => {
+    // If user wants to add a category, go to Category page
+    if (e.target.value === "add-category") {
+      router.push("/transactions/category");
+    } else {
+      setCategory(e.target.value);
+    }
+  };
+
+  // Categories from state
+  const renderedCategories = categories.map((cat) => (
+    <option key={cat.id}>{cat.name}</option>
+  ));
 
   // Button submit handler, add transaction data to Redux store
   const handleSubmit = (e) => {
@@ -46,6 +60,7 @@ export function TransactionsAddForm() {
         category,
       })
     );
+    setAmount(0), setDescription("");
   };
 
   return (
@@ -117,12 +132,18 @@ export function TransactionsAddForm() {
             value={category}
             onChange={handleCategoryChange}
           >
-            <option>Test</option>
+            <option key="0" value="" hidden></option>
+            <option key="1" value="add-category">+ Add Category</option>
+            {renderedCategories}
           </select>
         </label>
 
         {/* Submit button */}
-        <button type="button" onClick={handleSubmit}  className="py-1 px-2 bg-sky-600">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="py-1 px-2 bg-sky-600"
+        >
           Submit
         </button>
       </div>

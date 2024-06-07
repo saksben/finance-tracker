@@ -1,3 +1,5 @@
+"use client"
+
 import { TransactionsList } from "./TransactionsList";
 
 // Transactions page

@@ -15,7 +15,7 @@ const initialState = [
     type: "Expense",
     amount: 30,
     description: "Wal-Mart",
-    category: "groceries",
+    category: "Groceries",
   },
   {
     id: "2",
@@ -23,7 +23,7 @@ const initialState = [
     type: "Revenue",
     amount: 500,
     description: "Paycheck",
-    category: "job",
+    category: "Job",
   },
 ];
 

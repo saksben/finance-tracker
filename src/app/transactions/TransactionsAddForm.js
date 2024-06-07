@@ -13,8 +13,6 @@ export function TransactionsAddForm() {
   const router = useRouter();
   const categories = useSelector(selectCategory);
 
-  console.log(categories);
-
   // Format today's date as select element
   const today = new Date();
   const year = today.getFullYear();
@@ -64,9 +62,9 @@ export function TransactionsAddForm() {
   };
 
   return (
-    <form className="flex flex-col gap-2 justify-center items-center border rounded p-3 pt-2 w-9/12">
+    <div className="flex flex-col gap-2 justify-center items-center border rounded p-3 pt-2 w-9/12">
       <h4>Add a Transaction</h4>
-      <div className="flex gap-2 items-center">
+      <form className="flex gap-2 items-center">
         {/* Transaction date */}
         <label htmlFor="transactionDate">
           Date
@@ -133,7 +131,9 @@ export function TransactionsAddForm() {
             onChange={handleCategoryChange}
           >
             <option key="0" value="" hidden></option>
-            <option key="1" value="add-category">+ Add Category</option>
+            <option key="1" value="add-category">
+              + Add Category
+            </option>
             {renderedCategories}
           </select>
         </label>
@@ -146,7 +146,7 @@ export function TransactionsAddForm() {
         >
           Submit
         </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

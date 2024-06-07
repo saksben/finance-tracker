@@ -46,10 +46,12 @@ export function TransactionsList() {
       // Return a single transaction row
       <article key={transaction.id} className="flex gap-4 items-center">
         <p>{`${month}-${day}-${year}`}</p>
+        <p>{transaction.user}</p>
         <p>{transaction.type}</p>
         <p>${transaction.amount}</p>
         <p>{transaction.description}</p>
         <p>{transaction.category}</p>
+
         <button className="py-1 px-2 bg-slate-600" onClick={handleEdit}>
           Edit
         </button>

@@ -12,6 +12,7 @@ const initialState = [
   {
     id: "1",
     date: todayDate,
+    user: "Me",
     type: "Expense",
     amount: 30,
     description: "Wal-Mart",
@@ -20,6 +21,7 @@ const initialState = [
   {
     id: "2",
     date: todayDate,
+    user: "Me",
     type: "Revenue",
     amount: 500,
     description: "Paycheck",
@@ -38,10 +40,14 @@ export const transactionsSlice = createSlice({
     },
     // Action to edit a transaction
     transactionEdited(state, action) {
-      const { id, date, amount, description, type, category } = action.payload;
-      const foundTransaction = state.find((transaction) => transaction.id === id);
+      const { id, date, amount, description, type, category, user } =
+        action.payload;
+      const foundTransaction = state.find(
+        (transaction) => transaction.id === id
+      );
       if (foundTransaction) {
         foundTransaction.date = date;
+        foundTransaction.user = user;
         foundTransaction.amount = amount;
         foundTransaction.description = description;
         foundTransaction.type = type;
@@ -50,13 +56,14 @@ export const transactionsSlice = createSlice({
     },
     // Action to remove a transaction
     transactionRemoved(state, action) {
-        const {id} = action.payload
-        return state.filter(transaction => transaction.id !== id)
+      const { id } = action.payload;
+      return state.filter((transaction) => transaction.id !== id);
     },
   },
 });
 
-export const { transactionAdded, transactionEdited, transactionRemoved } = transactionsSlice.actions;
+export const { transactionAdded, transactionEdited, transactionRemoved } =
+  transactionsSlice.actions;
 
 export const selectTransaction = (state) => state.transactions;
 

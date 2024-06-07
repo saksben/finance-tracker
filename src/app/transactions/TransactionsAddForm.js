@@ -6,12 +6,14 @@ import { transactionAdded } from "../../lib/features/transactions/transactionsSl
 import { nanoid } from "@reduxjs/toolkit";
 import { useRouter } from "next/navigation";
 import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
+import { selectUser } from "../../lib/features/users/usersSlice";
 
 // TransactionsAddForm component to add a transaction to the list
 export function TransactionsAddForm() {
   const dispatch = useDispatch();
   const router = useRouter();
   const categories = useSelector(selectCategory);
+  const users = useSelector(selectUser);
 
   // Format today's date as select element
   const today = new Date();
@@ -21,6 +23,7 @@ export function TransactionsAddForm() {
 
   // Input states
   const [date, setDate] = React.useState(`${year}-${month}-${day}`);
+  const [user, setUser] = React.useState("Me");
   const [amount, setAmount] = React.useState(0);
   const [description, setDescription] = React.useState("Transaction");
   const [type, setType] = React.useState("Expense");
@@ -28,6 +31,7 @@ export function TransactionsAddForm() {
 
   // Input change handlers
   const handleDateChange = (e) => setDate(e.target.value);
+  const handleUserChange = (e) => setUser(e.target.value);
   const handleAmountChange = (e) => setAmount(e.target.value);
   const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handleTypeChange = (e) => setType(e.target.value);
@@ -45,6 +49,11 @@ export function TransactionsAddForm() {
     <option key={cat.id}>{cat.name}</option>
   ));
 
+  // Users from state
+  const renderedUsers = users.map((user) => (
+    <option key={user.id}>{user.name}</option>
+  ));
+
   // Button submit handler, add transaction data to Redux store
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,6 +61,7 @@ export function TransactionsAddForm() {
       transactionAdded({
         id: nanoid(),
         date,
+        user,
         amount,
         description,
         type,
@@ -76,6 +86,20 @@ export function TransactionsAddForm() {
             onChange={handleDateChange}
             required
           />
+        </label>
+
+        {/* Transaction user */}
+        <label htmlFor="transactionUser">
+          User
+          <select
+            placeholder="User"
+            id="transactionUser"
+            name="transactionUser"
+            value={user}
+            onChange={handleUserChange}
+          >
+            {renderedUsers}
+          </select>
         </label>
 
         {/* Transaction type */}

@@ -5,12 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { transactionEdited } from "../../lib/features/transactions/transactionsSlice";
 import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
 import { useRouter } from "next/navigation";
+import { selectUser } from "../../lib/features/users/usersSlice";
 
 // TransactionsEdit component to edit transactions
 export function TransactionsEditForm({ transactionId }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const categories = useSelector(selectCategory);
+  const users = useSelector(selectUser);
 
   // Get the specific transaction from state by its id
   const transaction = useSelector((state) =>
@@ -19,6 +21,7 @@ export function TransactionsEditForm({ transactionId }) {
 
   // Input states
   const [date, setDate] = React.useState(transaction.date);
+  const [user, setUser] = React.useState(transaction.user);
   const [amount, setAmount] = React.useState(transaction.amount);
   const [description, setDescription] = React.useState(transaction.description);
   const [type, setType] = React.useState(transaction.type);
@@ -26,6 +29,7 @@ export function TransactionsEditForm({ transactionId }) {
 
   // Input change handlers
   const handleDateChange = (e) => setDate(e.target.value);
+  const handleUserChange = (e) => setUser(e.target.value);
   const handleAmountChange = (e) => setAmount(e.target.value);
   const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handleTypeChange = (e) => setType(e.target.value);
@@ -43,6 +47,11 @@ export function TransactionsEditForm({ transactionId }) {
     <option key={cat.id}>{cat.name}</option>
   ));
 
+  // Users from state
+  const renderedUsers = users.map((user) => (
+    <option key={user.id}>{user.name}</option>
+  ));
+
   // On save, update this transaction in state and go back to transactions page
   const handleSave = () => {
     if (date) {
@@ -50,6 +59,7 @@ export function TransactionsEditForm({ transactionId }) {
         transactionEdited({
           id: transactionId,
           date,
+          user,
           amount,
           description,
           type,
@@ -75,6 +85,20 @@ export function TransactionsEditForm({ transactionId }) {
             onChange={handleDateChange}
             required
           />
+        </label>
+
+        {/* Transaction user */}
+        <label htmlFor="transactionUser">
+          User
+          <select
+            placeholder="User"
+            id="transactionUser"
+            name="transactionUser"
+            value={user}
+            onChange={handleUserChange}
+          >
+            {renderedUsers}
+          </select>
         </label>
 
         {/* Transaction type */}

@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { userAdded } from "../../lib/features/users/usersSlice";
 import { nanoid } from "@reduxjs/toolkit";
 
+// TODO: let user assign a color for the background of each user ("color" key in user object to state)
+
 // Component to add users
 export function UsersAddForm() {
   const dispatch = useDispatch();
@@ -32,7 +34,7 @@ export function UsersAddForm() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center border p-2 w-9/12">
       <h4>Add a User</h4>
       <form>
         {/* User name */}

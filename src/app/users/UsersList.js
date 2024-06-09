@@ -30,7 +30,7 @@ export function UsersList() {
     };
 
     return (
-      <article key={user.id} className="flex gap-4 items-center">
+      <article key={user.id} className="flex gap-2 items-center">
         <p>{user.name}</p>
         <button className="py-1 px-2 bg-slate-600" onClick={handleEdit}>
           Edit
@@ -43,7 +43,7 @@ export function UsersList() {
   });
 
   return (
-    <section>
+    <section className="flex flex-col gap-2 items-center">
       <h2>Users</h2>
       <UsersAddForm />
       {renderedUsers}

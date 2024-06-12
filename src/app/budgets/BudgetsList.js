@@ -20,12 +20,6 @@ export function BudgetsList() {
 
   // Create a budget for each one in state
   const renderedBudgets = budgets.map((budget) => {
-    const renderedCategories = budget.categories.map((category) => (
-      <p key={category.id}>
-        <span>{category.name}</span>
-        <span>Estimate: ${category.estimate}</span>
-      </p>
-    ));
 
     // On click, take to that budget's edit form page
     const handleEdit = () => {
@@ -44,11 +38,11 @@ export function BudgetsList() {
     return (
       // Return a single budget with edit and delete buttons
       <article key={budget.id} className="flex gap-2">
-        <span className="flex gap-2">
-          <p>{budget.name}</p>
-          <p>${budget.estimatedRevenue}</p>
-        </span>
-        <div>{renderedCategories}</div>
+        <a href={`/budgets/details/${budget.id}`}>
+          <span className="flex gap-2">
+            <p>{budget.name}</p>
+          </span>
+        </a>
         <button onClick={handleEdit} className="bg-slate-700">
           Edit
         </button>

@@ -50,6 +50,6 @@ export const selectBudget = (state) => state.budgets;
 export default budgetSlice.reducer;
 
 // Each BudgetItem compares estimated to actual from state. Budget calculates total estimated expenses, total actual expenses, total estimated revenue, total actual revenue, total estimated profit, and total actual profit, then compares and alerts.
-// Add EOM formula creation to budget. Get total deposits for each user (calculated), totalRegular for each user (add to User? A User variable set & passed per Account?), total expenses (calculated), totalRegular (calculated total from all users), total over/under paid (calculated: totalExpenses - totalRegular), total owed for each user (calculated: userOwed +- (totalOver/UnderPaid / numUsers)), stillOwed (calculated: totalExpenses - totalPaid), stillOwes per user (calculated: userOwes - userPaid)
+// Add EOM formula creation to budget. Get total deposits for each user (calculated, actual), totalRegular for each user (the user category estimate. add to User? A User variable set & passed per Account?), total expenses (calculated, actual), totalRegular (calculated total from all users estimates), total over/under paid (calculated: totalExpenses - totalRegular), total owed for each user (calculated: userOwed +- (totalOver/UnderPaid / numUsers)), stillOwed (calculated: totalExpenses - totalPaid), stillOwes per user (calculated: userOwes - userPaid)
 
 // For each category, get the amount from every transaction with that category and sum it.

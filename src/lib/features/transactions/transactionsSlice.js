@@ -16,7 +16,7 @@ const initialState = [
     type: "Expense",
     amount: 30,
     description: "Wal-Mart",
-    category: "Groceries",
+    category: "Food",
   },
   {
     id: "2",
@@ -25,8 +25,17 @@ const initialState = [
     type: "Revenue",
     amount: 500,
     description: "Paycheck",
-    category: "Job",
+    category: "Rent",
   },
+  {
+    id: "3",
+    date: todayDate,
+    user: "Me",
+    type: "Expense",
+    amount: 300,
+    description: "Winco",
+    category: "Food"
+  }
 ];
 
 // Redux slice pertaining to transactions

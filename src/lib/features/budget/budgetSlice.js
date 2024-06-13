@@ -7,12 +7,14 @@ const initialState = [
     name: "Personal Account",
     estimatedRevenue: 2000,
     categories: [{ id: "1", name: "Food", estimate: "200" }],
+    users: [{ id: "1", name: "Me", estimate: "300" }],
   },
   {
     id: "2",
     name: "Joint Account",
     estimatedRevenue: 3000,
     categories: [{ id: "2", name: "Rent", estimate: "1200" }],
+    users: [{ id: "1", name: "Me", estimate: "500" }],
   },
 ];
 
@@ -27,12 +29,13 @@ export const budgetSlice = createSlice({
     },
     // Action to edit a budget in state
     budgetEdited(state, action) {
-      const { id, name, estimatedRevenue, categories } = action.payload;
+      const { id, name, estimatedRevenue, categories, users } = action.payload;
       const foundBudget = state.find((budget) => budget.id === id);
       if (foundBudget) {
         foundBudget.name = name;
         foundBudget.estimatedRevenue = estimatedRevenue;
         foundBudget.categories = categories;
+        foundBudget.users = users;
       }
     },
     // Action to remove a budget from state

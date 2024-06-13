@@ -4,12 +4,12 @@ import { useSelector } from "react-redux";
 
 // BudgetDetails component to show a budget's details
 export function BudgetDetails({ budgetId }) {
-    // Get this specific budget from Redux
+  // Get this specific budget from Redux
   const budget = useSelector((state) =>
     state.budgets.find((budget) => budget.id === budgetId)
   );
 
-// Find all transactions related to the selected categories
+  // Find all transactions related to all selected categories
   const relatedTransactions = useSelector((state) => {
     return state.transactions.filter((transaction) =>
       budget.categories.some(
@@ -18,7 +18,21 @@ export function BudgetDetails({ budgetId }) {
     );
   });
 
-// Calculate the total dollar amount of all related transactions from each user
+// Calculate the total dollar amount of all related expenses and revenues
+  const typeTotals = relatedTransactions.reduce((acc, transaction) => {
+    if (!acc[transaction.type]) {
+      acc[transaction.type] = {
+        type: transaction.type,
+        total: 0,
+        transactions: [],
+      };
+    }
+    acc[transaction.type].total += transaction.amount;
+    acc[transaction.type].transactions.push(transaction);
+    return acc;
+  }, {});
+
+  // Calculate the total dollar amount of all related transactions from each user
   const userTotals = relatedTransactions.reduce((acc, transaction) => {
     if (!acc[transaction.user]) {
       acc[transaction.user] = {
@@ -32,7 +46,7 @@ export function BudgetDetails({ budgetId }) {
     return acc;
   }, {});
 
-// Display each selected category and its total
+  // Display each selected category and its estimate
   const renderedCategories = budget.categories.map((category) => (
     <p key={category.id} className="flex gap-2">
       <span>{category.name}</span>
@@ -40,7 +54,7 @@ export function BudgetDetails({ budgetId }) {
     </p>
   ));
 
-// Display the total dollar amount for all related transactions of each user
+  // Display the total dollar amount for all related transactions of each user
   const renderedUserTotals = Object.values(userTotals).map(
     ({ user, total, transactions }) => (
       <div key={user} className="flex gap-2">
@@ -58,12 +72,13 @@ export function BudgetDetails({ budgetId }) {
     )
   );
 
-// Get the total dollar amount that each user actually paid
-  const userPaid = Object.values(userTotals).map(
-    ({user, total}) => (
-        <div key={user}>
-            <p>User: {user}</p>
-        </div>
+// Display the total dollar amount for all related transactions of expenses and revenues
+  const renderedTypeTotals = Object.values(typeTotals).map(
+    ({ type, total, transactions }) => (
+      <div key={type} className="flex gap-2">
+        <p>Type: {type}</p>
+        <p>Total: ${total}</p>
+      </div>
     )
   );
 
@@ -75,6 +90,7 @@ export function BudgetDetails({ budgetId }) {
         <p>Categories:</p>
         {renderedCategories}
         {renderedUserTotals}
+        {renderedTypeTotals}
       </div>
     </div>
   );

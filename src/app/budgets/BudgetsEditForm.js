@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { budgetEdited } from "../../lib/features/budget/budgetSlice";
 import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
+import { selectUser } from "../../lib/features/users/usersSlice";
 
 // BudgetsEditForm component to edit budget
 export function BudgetsEditForm({ budgetId }) {
@@ -18,6 +19,9 @@ export function BudgetsEditForm({ budgetId }) {
 
   // Categories retrieved from Redux store
   const stateCategories = useSelector(selectCategory);
+
+  // Users retrieved from Redux store
+  const stateUsers = useSelector(selectUser);
 
   // Initial state
   const [name, setName] = React.useState(budget.name);
@@ -35,11 +39,27 @@ export function BudgetsEditForm({ budgetId }) {
   const [selectedCategories, setSelectedCategories] = React.useState(
     budget.categories
   );
+  // Initial state for users select element, starting with all store users except for those selected by the budget
+  const [users, setUsers] = React.useState(
+    stateUsers.filter(
+      (user) =>
+        !budget.users.find((selectedUser) => selectedUser.id === user.id)
+    )
+  );
+  // Initial state for the user-selected
+  const [selectedUsers, setSelectedUsers] = React.useState(budget.users);
 
   // Make a category option for each category in store
   const renderedStateCategories = categories.map((category) => (
     <option key={category.id} value={category.id}>
       {category.name}
+    </option>
+  ));
+
+  // Make a user option for each user in store
+  const renderedStateUsers = users.map((user) => (
+    <option key={user.id} value={user.id}>
+      {user.name}
     </option>
   ));
 
@@ -67,6 +87,16 @@ export function BudgetsEditForm({ budgetId }) {
         );
     }
   };
+  // When a user clicks a user, add the user to the user-selected list and remove it from available options
+  const handleUsersChange = (e) => {
+    const selectedUserId = e.target.value;
+    const selectedUser = users.find((user) => user.id === selectedUserId);
+
+    if (selectedUser) {
+      setSelectedUsers([...selectedUsers, { ...selectedUser, estimate: 0 }]),
+        setUsers(users.filter((user) => user.id !== selectedUserId));
+    }
+  };
 
   // On delete, remove category from selected categories and return it to available categories
   const handleCatDelete = (catId) => {
@@ -79,6 +109,15 @@ export function BudgetsEditForm({ budgetId }) {
     }
   };
 
+  // On delete, remove user from selected users and return it to available users
+  const handleUserDelete = (userId) => {
+    const selectedUser = selectedUsers.find((user) => user.id === userId);
+    if (selectedUser) {
+      setUsers([...users, selectedUser]);
+      setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+    }
+  };
+
   // Handler for when user changes category estimate
   const handleEstimate = (catId, value) => {
     setSelectedCategories(
@@ -88,12 +127,21 @@ export function BudgetsEditForm({ budgetId }) {
     );
   };
 
+  // Handler for when user changes user estimate
+  const handleUserEstimate = (userId, value) => {
+    setSelectedUsers(
+      selectedUsers.map((user) =>
+        user.id === userId ? { ...user, estimate: value } : user
+      )
+    );
+  };
+
   // An estimable budget item when selected by user to include in budget calculations
   const renderedItem = selectedCategories.map((cat) => {
     return (
       <span key={cat.id} className="flex">
         <p>{cat.name}</p>
-        <label htmlFor="budgetEstimated expense">
+        <label htmlFor="budgetEstimatedExpense">
           Estimate:
           <input
             type="number"
@@ -110,6 +158,31 @@ export function BudgetsEditForm({ budgetId }) {
     );
   });
 
+  // A user rendered when selected by user to include in budget calculation, who has an estimable budget contribution amount
+  const renderedUser = selectedUsers.map((user) => {
+    return (
+      <span key={user.id} className="flex">
+        <p>{user.name}</p>
+        <label htmlFor="budgetUserEstimation">
+          Estimated contribution:
+          <input
+            type="number"
+            id="budgetUserEstimation"
+            name="budgetUserEstimation"
+            value={user.estimate}
+            onChange={(e) => handleUserEstimate(user.id, e.target.value)}
+          />
+        </label>
+        <button
+          onClick={() => handleUserDelete(user.id)}
+          className="bg-red-600"
+        >
+          Delete
+        </button>
+      </span>
+    );
+  });
+
   // On click, update budget in state and return to budgets page
   const handleSave = (e) => {
     e.preventDefault();
@@ -119,6 +192,7 @@ export function BudgetsEditForm({ budgetId }) {
         name: name,
         estimatedRevenue: estRev,
         categories: selectedCategories,
+        users: selectedUsers,
       })
     );
     router.push("/budgets");
@@ -163,6 +237,15 @@ export function BudgetsEditForm({ budgetId }) {
           </select>
         </label>
         <div>{renderedItem}</div>
+        {/* Budget users */}
+        <label htmlFor="budgetUsers">
+          Users
+          <select id="budgetUsers" name="budgetUsers" onChange={handleUsersChange}>
+            <option key="0" value="" hidden></option>
+            {renderedStateUsers}
+          </select>
+        </label>
+        <div>{renderedUser}</div>
         <button
           type="button"
           onClick={handleSave}

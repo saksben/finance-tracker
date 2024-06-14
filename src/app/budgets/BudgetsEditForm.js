@@ -48,6 +48,10 @@ export function BudgetsEditForm({ budgetId }) {
   );
   // Initial state for the user-selected
   const [selectedUsers, setSelectedUsers] = React.useState(budget.users);
+  // Initial states for alerts
+  const [overbudgetAlert, setOverBudgetAlert] = React.useState(budget.alertOverbudget);
+  const [alertOverAmount, setAlertOverAmount] = React.useState(budget.alertOverAmount)
+  const [alertAmount, setAlertAmount] = React.useState(budget.alertAmount);
 
   // Make a category option for each category in store
   const renderedStateCategories = categories.map((category) => (
@@ -69,6 +73,17 @@ export function BudgetsEditForm({ budgetId }) {
   };
   const handleEstRevChange = (e) => {
     setEstRev(e.target.value);
+  };
+  // Toggle overbudget alert
+  const handleOverbudgetChange = () => {
+    setOverBudgetAlert(!overbudgetAlert);
+  };
+  // toggle alert for if budget is over a specified amount
+  const handleAlertOverAmountChange = () => {
+    setAlertOverAmount(!alertOverAmount)
+  }
+  const handleAlertAmountChange = (e) => {
+    setAlertAmount(e.target.value);
   };
   // When a user clicks a category, add the category to the user-selected list and remove it from available options
   const handleCategoryChange = (e) => {
@@ -193,6 +208,9 @@ export function BudgetsEditForm({ budgetId }) {
         estimatedRevenue: estRev,
         categories: selectedCategories,
         users: selectedUsers,
+        alertOverbudget: overbudgetAlert,
+        alertOverAmount: alertOverAmount,
+        alertAmount: alertAmount,
       })
     );
     router.push("/budgets");
@@ -202,6 +220,25 @@ export function BudgetsEditForm({ budgetId }) {
     <>
       <form>
         <h2>Edit Budget</h2>
+        <article>
+          <span>
+            <button className="bg-sky-500" onClick={handleOverbudgetChange}>
+              Alert Me When Overbudget
+            </button>
+          </span>
+          <span>
+            <button className="bg-sky-500" onClick={handleAlertOverAmountChange}>Alert Me When Over...</button>
+            <label htmlFor="alertAmount">
+              <input
+                type="number"
+                id="alertAmount"
+                name="alertAmount"
+                value={alertAmount}
+                onChange={handleAlertAmountChange}
+              />
+            </label>
+          </span>
+        </article>
         {/* Budget name */}
         <label htmlFor="budgetName">
           Name

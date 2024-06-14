@@ -4,14 +4,23 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
   budgetRemoved,
+  loadBudgets,
   selectBudget,
 } from "../../lib/features/budget/budgetSlice";
+import React from "react";
+import { selectTransaction } from "../../lib/features/transactions/transactionsSlice";
 
 // BudgetsList component to display all budgets from state
 export function BudgetsList() {
   const router = useRouter();
   const dispatch = useDispatch();
   const budgets = useSelector(selectBudget);
+  const transactions = useSelector(selectTransaction);
+
+  React.useEffect(() => {
+    // Load budgets with transactions when the component mounts
+    dispatch(loadBudgets({ budgets, transactions }));
+  }, [dispatch]); // Says it's missing dependencies, but using useCallback and playing with dependencies either gives same warning or infinite loop error
 
   // On click, take to budget add form page
   const handleAdd = () => {
@@ -20,7 +29,6 @@ export function BudgetsList() {
 
   // Create a budget for each one in state
   const renderedBudgets = budgets.map((budget) => {
-
     // On click, take to that budget's edit form page
     const handleEdit = () => {
       router.push(`/budgets/edit/${budget.id}`);
@@ -38,6 +46,9 @@ export function BudgetsList() {
     return (
       // Return a single budget with edit and delete buttons
       <article key={budget.id} className="flex gap-2">
+        {budget.overbudget && (
+          <span className="bg-orange-500 text-black">Overbudget!</span>
+        )}
         <a href={`/budgets/details/${budget.id}`}>
           <span className="flex gap-2">
             <p>{budget.name}</p>

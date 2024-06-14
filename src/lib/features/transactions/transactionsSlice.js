@@ -21,8 +21,8 @@ const initialState = [
   {
     id: "2",
     date: todayDate,
-    user: "Me",
-    type: "Revenue",
+    user: "Dad",
+    type: "Expense",
     amount: 500,
     description: "Paycheck",
     category: "Rent",

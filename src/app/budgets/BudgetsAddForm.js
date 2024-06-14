@@ -28,8 +28,12 @@ export function BudgetsAddForm() {
   const [selectedCategories, setSelectedCategories] = React.useState([]);
   // Initial state for the users in Redux store
   const [users, setUsers] = React.useState(stateUsers);
-  // Initial state for the user-selected
+  // Initial state for the user-selected users
   const [selectedUsers, setSelectedUsers] = React.useState([]);
+  // Initial states for alerts
+  const [overbudgetAlert, setOverBudgetAlert] = React.useState(false);
+  const [alertOverAmount, setAlertOverAmount] = React.useState(false)
+  const [alertAmount, setAlertAmount] = React.useState(0);
 
   // Make a category option for each category in store
   const renderedStateCategories = categories.map((category) => (
@@ -48,6 +52,17 @@ export function BudgetsAddForm() {
   // Change handlers
   const handleName = (e) => setName(e.target.value);
   const handleEstRev = (e) => setEstRev(e.target.value);
+  // Toggle overbudget alert
+  const handleOverbudget = () => {
+    setOverBudgetAlert(!overbudgetAlert);
+  };
+  // Toggle alert for if budget is over a specified amount
+  const handleAlertOverAmount = () => {
+    setAlertOverAmount(!alertOverAmount)
+  }
+  const handleAlertAmount = (e) => {
+    setAlertAmount(e.target.value);
+  };
   // When a user clicks a category, add the category to the user-selected list and remove it from available options
   const handleCategory = (e) => {
     const selectedCategoryId = e.target.value;
@@ -172,6 +187,9 @@ export function BudgetsAddForm() {
         estimatedRevenue: estRev,
         categories: selectedCategories,
         users: selectedUsers,
+        alertOverbudget: overbudgetAlert,
+        alertOverAmount: alertOverAmount,
+        alertAmount: alertAmount,
       })
     );
     router.push("/budgets");
@@ -182,6 +200,26 @@ export function BudgetsAddForm() {
       {/* Budget add form */}
       <form className="flex flex-col">
         <h2>Add a Budget</h2>
+        {/* Alerts */}
+        <article>
+          <span>
+            <button className="bg-sky-500" onClick={handleOverbudget}>
+              Alert Me When Overbudget
+            </button>
+          </span>
+          <span>
+            <button className="bg-sky-500" onClick={handleAlertOverAmount}>Alert Me When Over...</button>
+            <label htmlFor="alertAmount">
+              <input
+                type="number"
+                id="alertAmount"
+                name="alertAmount"
+                value={alertAmount}
+                onChange={handleAlertAmount}
+              />
+            </label>
+          </span>
+        </article>
         {/* Budget name */}
         <label htmlFor="budgetName">
           Name

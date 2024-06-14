@@ -1,7 +1,9 @@
 "use client";
 
+import React from "react";
+import { selectBudget, loadBudgets } from "../lib/features/budget/budgetSlice";
 import { selectTransaction } from "../lib/features/transactions/transactionsSlice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // TODO: add multiple totals components so that you can have one for each account
 // TODO: add account balance input
@@ -11,6 +13,13 @@ import { useSelector } from "react-redux";
 export default function Home() {
   // Import transactions state
   const transactions = useSelector(selectTransaction);
+  const budgets = useSelector(selectBudget)
+  const dispatch = useDispatch()
+
+  React.useEffect(() => {
+    // Load budgets with transactions when the component mounts
+    dispatch(loadBudgets({ budgets, transactions }));
+  }, [dispatch]); // Says it's missing dependencies, but using useCallback and playing with dependencies either gives same warning or infinite loop error
 
   let totalRevenue = 0;
   let totalExpenses = 0;
@@ -24,9 +33,18 @@ export default function Home() {
     }
   }
 
+  // If any budget is overbudget, flag overbudget alert
+  let overbudget = false;
+  for (let budget of budgets) {
+    if (budget.overbudget) {
+      overbudget = true
+    }
+  }
+
   return (
     <main className="flex flex-col items-center">
-      <h2 className="my-10">Dashboard</h2>
+      <h2 className="my-5">Dashboard</h2>
+      {overbudget && <span className="bg-orange-500 mb-5 text-black">Overbudget Alert!</span>}
       <div className="flex flex-col justify-center items-center bg-orange-50 w-6/12 py-10">
         <h3 className="text-black">
           Revenue: <span className="text-green-500">${totalRevenue}</span>

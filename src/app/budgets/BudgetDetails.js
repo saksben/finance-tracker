@@ -55,18 +55,21 @@ export function BudgetDetails({ budgetId }) {
 
   // Calculate the total dollar amount of all related transactions from each user
   const userTotals = relatedTransactions.reduce((acc, transaction) => {
-    if (!acc[transaction.user]) {
-      acc[transaction.user] = {
-        user: transaction.user,
-        total: 0,
-        estimate: 0,
-        transactions: [],
-      };
-    }
+    // Calculate totals for all users as long as they are part of the budget's selected users
+    if (budget.users.some((user) => user.name === transaction.user)) {
+      if (!acc[transaction.user]) {
+        acc[transaction.user] = {
+          user: transaction.user,
+          total: 0,
+          estimate: 0,
+          transactions: [],
+        };
+      }
 
-    acc[transaction.user].total += transaction.amount;
-    acc[transaction.user].transactions.push(transaction);
-    allUsersPaidActual += transaction.amount;
+      acc[transaction.user].total += transaction.amount;
+      acc[transaction.user].transactions.push(transaction);
+      allUsersPaidActual += transaction.amount;
+    }
     return acc;
   }, {});
 
@@ -160,16 +163,16 @@ export function BudgetDetails({ budgetId }) {
       <h4>{budget.name}</h4>
       {overbudget}
       {overbudgetAmount}
-      <p>Estimated Revenue: ${budget.estimatedRevenue}</p>
+      {/* <p>Estimated Revenue: ${budget.estimatedRevenue}</p> */}
       <div>
-        <p>Categories:</p>
-        {renderedCategories}
+        {/* <p>Categories:</p> */}
+        {/* {renderedCategories} */}
         {renderedTypeTotals}
         <p>
           Total Paid: $
           {Object.values(userTotals).reduce((sum, user) => sum + user.total, 0)}
         </p>
-        <p>Total Estimate (Regular Paid): ${totalCategoriesEstimate}</p>
+        <p>Total Estimate (Regularly Paid): ${totalCategoriesEstimate}</p>
         <p>Actual Expenses Due: ${expensesTotalActual}</p>
         <p>
           Over/(Under) Budget: ${overUnderEst}. Adjustment per user: $

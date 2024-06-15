@@ -9,33 +9,68 @@ const todayDate = `${year}-${month}-${day}`;
 
 // Initial state of transactions
 const initialState = [
+  // {
+  //   id: "1",
+  //   date: todayDate,
+  //   user: "Me",
+  //   type: "Expense",
+  //   amount: 30,
+  //   description: "Wal-Mart",
+  //   category: "Food",
+  // },
+  // {
+  //   id: "2",
+  //   date: todayDate,
+  //   user: "Dad",
+  //   type: "Revenue",
+  //   amount: 500,
+  //   description: "Paycheck",
+  //   category: "Rent",
+  // },
+  // {
+  //   id: "3",
+  //   date: todayDate,
+  //   user: "Me",
+  //   type: "Expense",
+  //   amount: 300,
+  //   description: "Winco",
+  //   category: "Food"
+  // },
   {
     id: "1",
     date: todayDate,
     user: "Me",
-    type: "Expense",
-    amount: 30,
-    description: "Wal-Mart",
-    category: "Food",
+    type: "Revenue",
+    amount: 1065,
+    description: "pymt",
+    category: "Budget",
   },
   {
     id: "2",
     date: todayDate,
-    user: "Dad",
-    type: "Expense",
-    amount: 500,
-    description: "Paycheck",
-    category: "Rent",
+    user: "Jonathan",
+    type: "Revenue",
+    amount: 1204,
+    description: "pymt",
+    category: "Budget",
   },
   {
     id: "3",
     date: todayDate,
-    user: "Me",
+    user: "Dad",
+    type: "Revenue",
+    amount: 0,
+    description: "pymt",
+    category: "Budget",
+  },
+  {
+    id: "4",
+    date: todayDate,
     type: "Expense",
-    amount: 300,
-    description: "Winco",
-    category: "Food"
-  }
+    amount: 3942,
+    description: "expenses",
+    category: "Budget",
+  },
 ];
 
 // Redux slice pertaining to transactions

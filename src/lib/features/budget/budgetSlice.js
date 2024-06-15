@@ -22,9 +22,13 @@ const initialState = [
   {
     id: "2",
     name: "Joint Account",
-    estimatedRevenue: 3000,
-    categories: [{ id: "2", name: "Rent", estimate: 50 }],
-    users: [{ id: "1", name: "Me", estimate: 500 }],
+    estimatedRevenue: 3870,
+    categories: [{ id: "3", name: "Budget", estimate: 3870 }],
+    users: [
+      { id: "1", name: "Me", estimate: 1333 },
+      { id: "2", name: "Jonathan", estimate: 1204 },
+      { id: "3", name: "Dad", estimate: 1333 },
+    ],
     alertOverbudget: false,
     alertOverAmount: false,
     overbudget: false,

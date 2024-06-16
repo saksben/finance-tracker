@@ -9,33 +9,6 @@ const todayDate = `${year}-${month}-${day}`;
 
 // Initial state of transactions
 const initialState = [
-  // {
-  //   id: "1",
-  //   date: todayDate,
-  //   user: "Me",
-  //   type: "Expense",
-  //   amount: 30,
-  //   description: "Wal-Mart",
-  //   category: "Food",
-  // },
-  // {
-  //   id: "2",
-  //   date: todayDate,
-  //   user: "Dad",
-  //   type: "Revenue",
-  //   amount: 500,
-  //   description: "Paycheck",
-  //   category: "Rent",
-  // },
-  // {
-  //   id: "3",
-  //   date: todayDate,
-  //   user: "Me",
-  //   type: "Expense",
-  //   amount: 300,
-  //   description: "Winco",
-  //   category: "Food"
-  // },
   {
     id: "1",
     date: todayDate,
@@ -71,6 +44,15 @@ const initialState = [
     description: "expenses",
     category: "Budget",
   },
+  {
+    id: "5",
+    date: todayDate,
+    user: "Me",
+    type: "Expense",
+    amount: 3000,
+    description: "rent",
+    category: "Rent"
+  }
 ];
 
 // Redux slice pertaining to transactions

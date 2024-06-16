@@ -7,8 +7,8 @@ const initialState = [
     name: "Personal Account",
     estimatedRevenue: 2000,
     categories: [
-      { id: "1", name: "Food", estimate: 200 },
-      { id: "2", name: "Rent", estimate: 550 },
+      { id: "1", name: "Food", estimate: 50 },
+      { id: "2", name: "Rent", estimate: 1500 },
     ],
     users: [
       { id: "1", name: "Me", estimate: 300 },

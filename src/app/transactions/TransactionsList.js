@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { TransactionsAddForm } from "./TransactionsAddForm";
 import { useRouter } from "next/navigation";
+import { TransactionsChart } from "./TransactionsChart";
 
 // TODO: put in a table to organize and track inflows and outflows
 // TODO: add date once for readability?
@@ -65,8 +66,10 @@ export function TransactionsList() {
   return (
     <section className="flex flex-col items-center">
       <h2>Transactions</h2>
+
       <TransactionsAddForm />
       <span>{renderedTransactions}</span>
+        <TransactionsChart />
     </section>
   );
 }

@@ -11,7 +11,7 @@ const todayDate = `${year}-${month}-${day}`;
 const initialState = [
   {
     id: "1",
-    date: todayDate,
+    date: "2024-06-04",
     user: "Me",
     type: "Revenue",
     amount: 1065,
@@ -20,7 +20,7 @@ const initialState = [
   },
   {
     id: "2",
-    date: todayDate,
+    date: "2024-06-05",
     user: "Jonathan",
     type: "Revenue",
     amount: 1204,
@@ -29,7 +29,7 @@ const initialState = [
   },
   {
     id: "3",
-    date: todayDate,
+    date: "2024-06-08",
     user: "Dad",
     type: "Revenue",
     amount: 0,
@@ -38,7 +38,7 @@ const initialState = [
   },
   {
     id: "4",
-    date: todayDate,
+    date: "2024-06-11",
     type: "Expense",
     amount: 3942,
     description: "expenses",
@@ -46,7 +46,7 @@ const initialState = [
   },
   {
     id: "5",
-    date: todayDate,
+    date: "2024-06-15",
     user: "Me",
     type: "Expense",
     amount: 3000,

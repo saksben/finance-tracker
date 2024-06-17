@@ -4,60 +4,76 @@ import { Chart, registerables } from "chart.js";
 import React from "react";
 import "chartjs-adapter-moment";
 
+// Necessary for chart.js to function
 Chart.register(...registerables);
 
+// TransactionsChart component to make a chart of all transactions
 export function TransactionsChart() {
   const transactions = useSelector(selectTransaction);
+  // Organizes transactions by date and type and aggregates their amounts. Memoizes transactions data so it doesn't need to re-render each time
   const groupedTransactions = React.useMemo(() => {
+    const grouped = {};
 
-    const grouped = {}
-
+    // Adds the transaction amounts for each date
     transactions.forEach((transaction) => {
-    const { date, type, amount } = transaction;
-    if (!grouped[date]) {
-      grouped[date] = {
-        Expense: 0,
-        Revenue: 0,
-      };
-    }
-    grouped[date][type] += amount;
-  });
-  return grouped
-  }, [transactions])
+      const { date, type, amount } = transaction;
+      if (!grouped[date]) {
+        grouped[date] = {
+          Expense: 0,
+          Revenue: 0,
+        };
+      }
+      grouped[date][type] += amount;
+    });
+    return grouped;
+  }, [transactions]);
 
-  const {dates, dailyExpenses, dailyRevenues, cumulativeExpenseAmounts, cumulativeRevenueAmounts} = React.useMemo(() => {
+  // Aggregate the daily and cumulative transaction data. Memoize so it doesn't need to re-render for each thing
+  const {
+    dates,
+    dailyExpenses,
+    dailyRevenues,
+    cumulativeExpenseAmounts,
+    cumulativeRevenueAmounts,
+  } = React.useMemo(() => {
     const dates = Object.keys(groupedTransactions).sort();
-  const dailyExpenses = [];
-  const dailyRevenues = [];
-  let cumulativeExpenses = 0;
-  let cumulativeRevenues = 0;
-  const cumulativeExpenseAmounts = [];
-  const cumulativeRevenueAmounts = [];
+    const dailyExpenses = [];
+    const dailyRevenues = [];
+    let cumulativeExpenses = 0;
+    let cumulativeRevenues = 0;
+    const cumulativeExpenseAmounts = [];
+    const cumulativeRevenueAmounts = [];
 
-  dates.forEach((date) => {
-    const dailyExpense = groupedTransactions[date].Expense;
-    const dailyRevenue = groupedTransactions[date].Revenue;
+    dates.forEach((date) => {
+      const dailyExpense = groupedTransactions[date].Expense;
+      const dailyRevenue = groupedTransactions[date].Revenue;
 
-    dailyExpenses.push(dailyExpense);
-    dailyRevenues.push(dailyRevenue);
+      dailyExpenses.push(dailyExpense);
+      dailyRevenues.push(dailyRevenue);
 
-    cumulativeExpenses += dailyExpense;
-    cumulativeRevenues += dailyRevenue;
-    cumulativeExpenseAmounts.push(cumulativeExpenses);
-    cumulativeRevenueAmounts.push(cumulativeRevenues);
-  });
-  return {dates, dailyExpenses, dailyRevenues, cumulativeExpenseAmounts, cumulativeRevenueAmounts}
-  }, [groupedTransactions])
-
-  
+      cumulativeExpenses += dailyExpense;
+      cumulativeRevenues += dailyRevenue;
+      cumulativeExpenseAmounts.push(cumulativeExpenses);
+      cumulativeRevenueAmounts.push(cumulativeRevenues);
+    });
+    return {
+      dates,
+      dailyExpenses,
+      dailyRevenues,
+      cumulativeExpenseAmounts,
+      cumulativeRevenueAmounts,
+    };
+  }, [groupedTransactions]);
 
   React.useEffect(() => {
-    const ctx = document.getElementById("lineChart").getContext("2d");
+    // Create the line chart for transactions
+    const ctx = document.getElementById("transactionsChart").getContext("2d");
     const lineChart = new Chart(ctx, {
       type: "line",
       data: {
         labels: dates,
         datasets: [
+          // Daily Expenses line
           {
             label: "Daily Expenses",
             data: dailyExpenses,
@@ -66,6 +82,7 @@ export function TransactionsChart() {
             borderWidth: 1,
             fill: false,
           },
+          // Daily Revenues line
           {
             label: "Daily Revenues",
             data: dailyRevenues,
@@ -74,6 +91,7 @@ export function TransactionsChart() {
             borderWidth: 1,
             fill: false,
           },
+          // Cumulative Expenses line
           {
             label: "Cumulative Expenses",
             data: cumulativeExpenseAmounts,
@@ -82,6 +100,7 @@ export function TransactionsChart() {
             borderWidth: 1,
             fill: false,
           },
+          // Cumulative Revenues line
           {
             label: "Cumulative Revenues",
             data: cumulativeRevenueAmounts,
@@ -122,5 +141,5 @@ export function TransactionsChart() {
     cumulativeRevenueAmounts,
   ]);
 
-  return <canvas id="lineChart"></canvas>;
+  return <canvas id="transactionsChart"></canvas>;
 }

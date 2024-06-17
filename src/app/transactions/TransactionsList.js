@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TransactionsAddForm } from "./TransactionsAddForm";
 import { useRouter } from "next/navigation";
 import { TransactionsChart } from "./TransactionsChart";
+import Papa from "papaparse";
 
 // TODO: put in a table to organize and track inflows and outflows
 // TODO: add date once for readability?
@@ -63,13 +64,36 @@ export function TransactionsList() {
     );
   });
 
+  // Export transaction data to csv
+  const exportCsv = (transactions) => {
+    const csvTransactions = transactions.map((transaction) => ({
+      Date: transaction.date,
+      User: transaction.user,
+      Type: transaction.type,
+      Amount: transaction.amount,
+      Description: transaction.description,
+      Category: transaction.category,
+    }));
+    const csv = Papa.unparse(csvTransactions);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "transactions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <section className="flex flex-col items-center">
       <h2>Transactions</h2>
-
       <TransactionsAddForm />
+      <button className="bg-sky-500" onClick={() => exportCsv(transactions)}>
+        Export to CSV
+      </button>
       <span>{renderedTransactions}</span>
-        <TransactionsChart />
+      <TransactionsChart />
     </section>
   );
 }

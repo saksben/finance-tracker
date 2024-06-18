@@ -11,8 +11,7 @@ const initialState = [
       { id: "2", name: "Rent", estimate: 1500 },
     ],
     users: [
-      { id: "1", name: "Me", estimate: 300 },
-      { id: "2", name: "Dad", estimate: 450 },
+      { id: "1", name: "Me", estimate: 1550 },
     ],
     alertOverbudget: true,
     alertOverAmount: true,

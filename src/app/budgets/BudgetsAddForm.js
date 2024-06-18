@@ -32,7 +32,7 @@ export function BudgetsAddForm() {
   const [selectedUsers, setSelectedUsers] = React.useState([]);
   // Initial states for alerts
   const [overbudgetAlert, setOverBudgetAlert] = React.useState(false);
-  const [alertOverAmount, setAlertOverAmount] = React.useState(false)
+  const [alertOverAmount, setAlertOverAmount] = React.useState(false);
   const [alertAmount, setAlertAmount] = React.useState(0);
 
   // Make a category option for each category in store
@@ -58,8 +58,8 @@ export function BudgetsAddForm() {
   };
   // Toggle alert for if budget is over a specified amount
   const handleAlertOverAmount = () => {
-    setAlertOverAmount(!alertOverAmount)
-  }
+    setAlertOverAmount(!alertOverAmount);
+  };
   const handleAlertAmount = (e) => {
     setAlertAmount(e.target.value);
   };
@@ -196,19 +196,27 @@ export function BudgetsAddForm() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-2 items-center mt-3">
       {/* Budget add form */}
-      <form className="flex flex-col">
-        <h2>Add a Budget</h2>
+      <form className="flex flex-col gap-2">
+        <h2 className="text-center">Add a Budget</h2>
         {/* Alerts */}
-        <article>
+        <article className="flex flex-col gap-2 border p-5 my-5 rounded items-center justify-center">
           <span>
-            <button className="bg-sky-500" onClick={handleOverbudget}>
+            <button
+              className="bg-sky-500 py-1 px-2 rounded"
+              onClick={handleOverbudget}
+            >
               Alert Me When Overbudget
             </button>
           </span>
           <span>
-            <button className="bg-sky-500" onClick={handleAlertOverAmount}>Alert Me When Over...</button>
+            <button
+              className="bg-sky-500 py-1 px-2 rounded mr-2"
+              onClick={handleAlertOverAmount}
+            >
+              Alert Me When Over...
+            </button>
             <label htmlFor="alertAmount">
               <input
                 type="number"
@@ -216,6 +224,7 @@ export function BudgetsAddForm() {
                 name="alertAmount"
                 value={alertAmount}
                 onChange={handleAlertAmount}
+                className="px-2 w-[100px]"
               />
             </label>
           </span>
@@ -229,6 +238,7 @@ export function BudgetsAddForm() {
             value={name}
             onChange={handleName}
             required
+            className="ml-2 px-2"
           />
         </label>
         {/* Budget estimated revenue */}
@@ -240,6 +250,7 @@ export function BudgetsAddForm() {
             value={estRev}
             onChange={handleEstRev}
             required
+            className="ml-2 px-2"
           />
         </label>
         {/* Budget categories */}
@@ -249,6 +260,7 @@ export function BudgetsAddForm() {
             id="budgetCategory"
             name="budgetCategory"
             onChange={handleCategory}
+            className="ml-2 px-2"
           >
             <option key="0" value="" hidden></option>
             {renderedStateCategories}
@@ -258,7 +270,12 @@ export function BudgetsAddForm() {
         {/* Budget users */}
         <label htmlFor="budgetUsers">
           Users
-          <select id="budgetUsers" name="budgetUsers" onChange={handleUsers}>
+          <select
+            id="budgetUsers"
+            name="budgetUsers"
+            onChange={handleUsers}
+            className="ml-2 px-2"
+          >
             <option key="0" value="" hidden></option>
             {renderedStateUsers}
           </select>
@@ -267,11 +284,11 @@ export function BudgetsAddForm() {
         <button
           type="button"
           onClick={handleSubmit}
-          className="bg-sky-500 w-[60px]"
+          className="bg-sky-500 py-1 px-2 rounded"
         >
           Submit
         </button>
       </form>
-    </>
+    </div>
   );
 }

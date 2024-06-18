@@ -47,12 +47,28 @@ const initialState = [
   {
     id: "5",
     date: "2024-06-15",
-    user: "Me",
     type: "Expense",
     amount: 3000,
     description: "rent",
-    category: "Rent"
-  }
+    category: "Rent",
+  },
+  {
+    id: "6",
+    date: "2024-06-16",
+    type: "Expense",
+    amount: 50,
+    description: "Pizza",
+    category: "Food",
+  },
+  {
+    id: "7",
+    date: "2024-06-17",
+    user: "Me",
+    type: "Revenue",
+    amount: 1500,
+    description: "pymt",
+    category: "Rent",
+  },
 ];
 
 // Redux slice pertaining to transactions

@@ -34,7 +34,7 @@ export function UsersAddForm() {
   };
 
   return (
-    <div className="flex flex-col items-center border p-2 w-9/12">
+    <div className="flex flex-col items-center border p-2 w-9/12 rounded">
       <h4>Add a User</h4>
       <form>
         {/* User name */}
@@ -47,12 +47,13 @@ export function UsersAddForm() {
             value={name}
             onChange={handleName}
             required
+            className="ml-2"
           />
         </label>
         <button
           type="button"
           onClick={handleSubmit}
-          className="py-1 px-2 bg-sky-600"
+          className="ml-2 py-1 px-2 rounded bg-sky-500"
         >
           Submit
         </button>

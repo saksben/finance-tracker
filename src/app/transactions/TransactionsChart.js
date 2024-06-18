@@ -7,6 +7,9 @@ import "chartjs-adapter-moment";
 // Necessary for chart.js to function
 Chart.register(...registerables);
 
+// Chart text color
+Chart.defaults.color = "#FFFFFF"
+
 // TransactionsChart component to make a chart of all transactions
 export function TransactionsChart() {
   const transactions = useSelector(selectTransaction);
@@ -78,7 +81,7 @@ export function TransactionsChart() {
             label: "Daily Expenses",
             data: dailyExpenses,
             borderColor: "red",
-            backgroundColor: "rgba(255, 99, 132, 0.2",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
             borderWidth: 1,
             fill: false,
           },
@@ -87,7 +90,7 @@ export function TransactionsChart() {
             label: "Daily Revenues",
             data: dailyRevenues,
             borderColor: "green",
-            backgroundColor: "rgba(75, 192, 192, 0.2",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
             borderWidth: 1,
             fill: false,
           },
@@ -96,7 +99,7 @@ export function TransactionsChart() {
             label: "Cumulative Expenses",
             data: cumulativeExpenseAmounts,
             borderColor: "darkred",
-            backgroundColor: "rgba(255, 99, 132, 0.2",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
             borderWidth: 1,
             fill: false,
           },
@@ -105,7 +108,7 @@ export function TransactionsChart() {
             label: "Cumulative Revenues",
             data: cumulativeRevenueAmounts,
             borderColor: "darkgreen",
-            backgroundColor: "rgba(75, 192, 192, 0.2",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
             borderWidth: 1,
             fill: false,
           },

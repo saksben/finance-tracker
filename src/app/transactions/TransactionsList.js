@@ -10,6 +10,7 @@ import { TransactionsAddForm } from "./TransactionsAddForm";
 import { useRouter } from "next/navigation";
 import { TransactionsChart } from "./TransactionsChart";
 import Papa from "papaparse";
+import { cn } from "../../lib/utilities/cn";
 
 // TODO: put in a table to organize and track inflows and outflows
 // TODO: add date once for readability?
@@ -46,20 +47,24 @@ export function TransactionsList() {
 
     return (
       // Return a single transaction row
-      <article key={transaction.id} className="flex gap-4 items-center">
-        <p>{`${month}-${day}-${year}`}</p>
-        <p>{transaction.user}</p>
-        <p>{transaction.type}</p>
-        <p>${transaction.amount}</p>
-        <p>{transaction.description}</p>
-        <p>{transaction.category}</p>
+      <article key={transaction.id} className="flex flex-col sm:flex-row items-center justify-center mb-1">
+        <div className="flex gap-1 sm:mr-1">
+          <p>{`${month}-${day}-${year}`}</p>
+          <p>{transaction.user}</p>
+          <p className={cn(transaction.type === "Revenue" ? "text-green-600" : "text-red-600")}>{transaction.type}</p>
+          <p>${transaction.amount}</p>
+          <p>{transaction.description}</p>
+          <p>{transaction.category}</p>
+        </div>
 
-        <button className="py-1 px-2 bg-slate-600" onClick={handleEdit}>
-          Edit
-        </button>
-        <button className="py-1 px-2 bg-red-600" onClick={handleDelete}>
-          Delete
-        </button>
+        <div className="flex gap-1">
+          <button className="py-1 px-2 bg-slate-500 rounded" onClick={handleEdit}>
+            Edit
+          </button>
+          <button className="py-1 px-2 bg-red-600 rounded" onClick={handleDelete}>
+            Delete
+          </button>
+        </div>
       </article>
     );
   });
@@ -86,14 +91,16 @@ export function TransactionsList() {
   };
 
   return (
-    <section className="flex flex-col items-center">
-      <h2>Transactions</h2>
-      <TransactionsAddForm />
-      <button className="bg-sky-500" onClick={() => exportCsv(transactions)}>
-        Export to CSV
-      </button>
-      <span>{renderedTransactions}</span>
-      <TransactionsChart />
-    </section>
+    <div className="flex items-center justify-center">
+      <section className="flex flex-col items-center w-11/12">
+        <h2 className="py-5">Transactions</h2>
+        <TransactionsAddForm />
+        <button className="bg-sky-500 px-2 py-1 rounded my-3" onClick={() => exportCsv(transactions)}>
+          Export to CSV
+        </button>
+        <span className="border-b mb-5">{renderedTransactions}</span>
+        <TransactionsChart />
+      </section>
+    </div>
   );
 }

@@ -45,19 +45,19 @@ export function BudgetsList() {
 
     return (
       // Return a single budget with edit and delete buttons
-      <article key={budget.id} className="flex gap-2">
+      <article key={budget.id} className="flex gap-2 items-center mb-2">
         {budget.overbudget && (
-          <span className="bg-orange-500 text-black">Overbudget!</span>
+          <span className="bg-orange-500 text-white flex items-center justify-center rounded p-1">Overbudget!</span>
         )}
         <a href={`/budgets/details/${budget.id}`}>
           <span className="flex gap-2">
             <p>{budget.name}</p>
           </span>
         </a>
-        <button onClick={handleEdit} className="bg-slate-700">
+        <button onClick={handleEdit} className="py-1 px-2 bg-slate-500 rounded">
           Edit
         </button>
-        <button onClick={handleDelete} className="bg-red-600">
+        <button onClick={handleDelete} className="py-1 px-2 bg-red-600 rounded">
           Delete
         </button>
       </article>
@@ -66,11 +66,11 @@ export function BudgetsList() {
 
   return (
     <div className="flex flex-col items-center">
-      <h2>Budgets</h2>
-      <button className="bg-sky-500" onClick={handleAdd}>
+      <h2 className="my-3">Budgets</h2>
+      <button className="bg-sky-500 mb-5 py-1 px-2 rounded" onClick={handleAdd}>
         Add a Budget
       </button>
-      {renderedBudgets}
+      <div className="flex flex-col items-center border p-2 rounded">{renderedBudgets}</div>
     </div>
   );
 }

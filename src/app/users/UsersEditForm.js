@@ -35,7 +35,7 @@ export function UsersEditForm({ userId }) {
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 items-center mt-3">
       <h4>Edit User</h4>
       <form>
         {/* User name */}
@@ -48,12 +48,13 @@ export function UsersEditForm({ userId }) {
             value={name}
             onChange={handleNameChange}
             required
+            className="ml-2 px-2"
           />
         </label>
         <button
           type="button"
           onClick={handleSave}
-          className="py-1 px-2 bg-sky-600"
+          className="ml-2 py-1 px-2 rounded bg-sky-500"
         >
           Submit
         </button>

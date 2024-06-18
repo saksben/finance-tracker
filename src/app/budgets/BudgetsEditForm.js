@@ -49,8 +49,12 @@ export function BudgetsEditForm({ budgetId }) {
   // Initial state for the user-selected
   const [selectedUsers, setSelectedUsers] = React.useState(budget.users);
   // Initial states for alerts
-  const [overbudgetAlert, setOverBudgetAlert] = React.useState(budget.alertOverbudget);
-  const [alertOverAmount, setAlertOverAmount] = React.useState(budget.alertOverAmount)
+  const [overbudgetAlert, setOverBudgetAlert] = React.useState(
+    budget.alertOverbudget
+  );
+  const [alertOverAmount, setAlertOverAmount] = React.useState(
+    budget.alertOverAmount
+  );
   const [alertAmount, setAlertAmount] = React.useState(budget.alertAmount);
 
   // Make a category option for each category in store
@@ -75,13 +79,15 @@ export function BudgetsEditForm({ budgetId }) {
     setEstRev(e.target.value);
   };
   // Toggle overbudget alert
-  const handleOverbudgetChange = () => {
+  const handleOverbudgetChange = (e) => {
+    e.preventDefault()
     setOverBudgetAlert(!overbudgetAlert);
   };
   // toggle alert for if budget is over a specified amount
-  const handleAlertOverAmountChange = () => {
-    setAlertOverAmount(!alertOverAmount)
-  }
+  const handleAlertOverAmountChange = (e) => {
+    e.preventDefault()
+    setAlertOverAmount(!alertOverAmount);
+  };
   const handleAlertAmountChange = (e) => {
     setAlertAmount(e.target.value);
   };
@@ -154,7 +160,10 @@ export function BudgetsEditForm({ budgetId }) {
   // An estimable budget item when selected by user to include in budget calculations
   const renderedItem = selectedCategories.map((cat) => {
     return (
-      <span key={cat.id} className="flex">
+      <span
+        key={cat.id}
+        className="flex items-center justify-center gap-2 mb-2"
+      >
         <p>{cat.name}</p>
         <label htmlFor="budgetEstimatedExpense">
           Estimate:
@@ -164,9 +173,13 @@ export function BudgetsEditForm({ budgetId }) {
             name="budgetEstimatedExpense"
             value={cat.estimate}
             onChange={(e) => handleEstimate(cat.id, e.target.value)}
+            className="ml-2 px-2"
           />
         </label>
-        <button onClick={() => handleCatDelete(cat.id)} className="bg-red-600">
+        <button
+          onClick={() => handleCatDelete(cat.id)}
+          className="bg-red-600 py-1 px-2 rounded"
+        >
           Delete
         </button>
       </span>
@@ -176,7 +189,10 @@ export function BudgetsEditForm({ budgetId }) {
   // A user rendered when selected by user to include in budget calculation, who has an estimable budget contribution amount
   const renderedUser = selectedUsers.map((user) => {
     return (
-      <span key={user.id} className="flex">
+      <span
+        key={user.id}
+        className="flex items-center justify-center gap-2 mb-2"
+      >
         <p>{user.name}</p>
         <label htmlFor="budgetUserEstimation">
           Estimated contribution:
@@ -186,11 +202,12 @@ export function BudgetsEditForm({ budgetId }) {
             name="budgetUserEstimation"
             value={user.estimate}
             onChange={(e) => handleUserEstimate(user.id, e.target.value)}
+            className="ml-2 px-2"
           />
         </label>
         <button
           onClick={() => handleUserDelete(user.id)}
-          className="bg-red-600"
+          className="bg-red-600 py-1 px-2 rounded"
         >
           Delete
         </button>
@@ -217,80 +234,102 @@ export function BudgetsEditForm({ budgetId }) {
   };
 
   return (
-    <>
-      <form>
-        <h2>Edit Budget</h2>
-        <article>
-          <span>
-            <button className="bg-sky-500" onClick={handleOverbudgetChange}>
-              Alert Me When Overbudget
-            </button>
-          </span>
-          <span>
-            <button className="bg-sky-500" onClick={handleAlertOverAmountChange}>Alert Me When Over...</button>
-            <label htmlFor="alertAmount">
-              <input
-                type="number"
-                id="alertAmount"
-                name="alertAmount"
-                value={alertAmount}
-                onChange={handleAlertAmountChange}
-              />
-            </label>
-          </span>
-        </article>
-        {/* Budget name */}
-        <label htmlFor="budgetName">
-          Name
-          <input
-            id="budgetName"
-            name="budgetName"
-            value={name}
-            onChange={handleNameChange}
-            required
-          />
-        </label>
-        {/* Budget estimated revenue */}
-        <label htmlFor="budgetEstimatedRevenue">
-          Expected Revenue
-          <input
-            id="budgetEstimatedRevenue"
-            name="budgetEstimatedRevenue"
-            value={estRev}
-            onChange={handleEstRevChange}
-            required
-          />
-        </label>
-        {/* Budget categories */}
-        <label htmlFor="budgetCategory">
-          Categories
-          <select
-            id="budgetCategory"
-            name="budgetCategory"
-            onChange={handleCategoryChange}
+    <div className="flex justify-center">
+      <div className="flex flex-col gap-2 items-center mt-3 w-11/12">
+        <form className="flex flex-col gap-2">
+          <h2 className="text-center">Edit Budget</h2>
+          <article className="flex flex-col gap-2 border p-5 my-5 rounded items-center justify-center">
+            <p>Alerts: Click to...</p>
+            <span>
+              <button
+                className="bg-sky-500 py-1 px-2 rounded"
+                onClick={handleOverbudgetChange}
+              >
+                {overbudgetAlert && <span>NOT </span>}
+                Alert Me When Overbudget
+              </button>
+            </span>
+            <span>
+              <button
+                className="bg-sky-500 py-1 px-2 rounded mr-2"
+                onClick={handleAlertOverAmountChange}
+              >
+                {alertOverAmount && <span>NOT </span>}
+                Alert Me When Over...
+              </button>
+              <label htmlFor="alertAmount">
+                <input
+                  type="number"
+                  id="alertAmount"
+                  name="alertAmount"
+                  value={alertAmount}
+                  onChange={handleAlertAmountChange}
+                  className="px-2 w-[100px]"
+                />
+              </label>
+            </span>
+          </article>
+          {/* Budget name */}
+          <label htmlFor="budgetName">
+            Name
+            <input
+              id="budgetName"
+              name="budgetName"
+              value={name}
+              onChange={handleNameChange}
+              required
+              className="ml-2 px-2"
+            />
+          </label>
+          {/* Budget estimated revenue */}
+          <label htmlFor="budgetEstimatedRevenue">
+            Expected Revenue
+            <input
+              id="budgetEstimatedRevenue"
+              name="budgetEstimatedRevenue"
+              value={estRev}
+              onChange={handleEstRevChange}
+              required
+              className="ml-2 px-2"
+            />
+          </label>
+          {/* Budget categories */}
+          <label htmlFor="budgetCategory">
+            Categories
+            <select
+              id="budgetCategory"
+              name="budgetCategory"
+              onChange={handleCategoryChange}
+              className="ml-2 px-2"
+            >
+              <option key="0" value="" hidden></option>
+              {renderedStateCategories}
+            </select>
+          </label>
+          <div>{renderedItem}</div>
+          {/* Budget users */}
+          <label htmlFor="budgetUsers">
+            Users
+            <select
+              id="budgetUsers"
+              name="budgetUsers"
+              onChange={handleUsersChange}
+              className="ml-2 px-2"
+            >
+              <option key="0" value="" hidden></option>
+              {renderedStateUsers}
+            </select>
+          </label>
+          <div>{renderedUser}</div>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-sky-500 py-1 px-2 rounded"
           >
-            <option key="0" value="" hidden></option>
-            {renderedStateCategories}
-          </select>
-        </label>
-        <div>{renderedItem}</div>
-        {/* Budget users */}
-        <label htmlFor="budgetUsers">
-          Users
-          <select id="budgetUsers" name="budgetUsers" onChange={handleUsersChange}>
-            <option key="0" value="" hidden></option>
-            {renderedStateUsers}
-          </select>
-        </label>
-        <div>{renderedUser}</div>
-        <button
-          type="button"
-          onClick={handleSave}
-          className="bg-sky-500 w-[60px]"
-        >
-          Save
-        </button>
-      </form>
-    </>
+            Save
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

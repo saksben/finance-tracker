@@ -71,9 +71,9 @@ export function TransactionsEditForm({ transactionId }) {
   };
 
   return (
-    <div>
-      <h4>Edit Transaction</h4>
-      <form>
+    <div className="flex flex-col items-center">
+      <h4 className="my-5">Edit Transaction</h4>
+      <form className="flex flex-col lg:flex-row gap-1 lg:items-center justify-center w-11/12">
         {/* Transaction date */}
         <label htmlFor="transactionDate">
           Date
@@ -84,6 +84,7 @@ export function TransactionsEditForm({ transactionId }) {
             value={date}
             onChange={handleDateChange}
             required
+            className="ml-1"
           />
         </label>
 
@@ -96,6 +97,7 @@ export function TransactionsEditForm({ transactionId }) {
             name="transactionUser"
             value={user}
             onChange={handleUserChange}
+            className="ml-1"
           >
             {renderedUsers}
           </select>
@@ -111,6 +113,7 @@ export function TransactionsEditForm({ transactionId }) {
             name="transactionType"
             value={type}
             onChange={handleTypeChange}
+            className="ml-1"
           >
             <option>Expense</option>
             <option>Revenue</option>
@@ -125,7 +128,7 @@ export function TransactionsEditForm({ transactionId }) {
             id="transactionAmount"
             name="transactionAmount"
             value={amount}
-            className="w-[100px]"
+            className="w-[100px] px-2 ml-1"
             onChange={handleAmountChange}
             required
           />
@@ -140,6 +143,7 @@ export function TransactionsEditForm({ transactionId }) {
             name="transactionDescription"
             value={description}
             onChange={handleDescriptionChange}
+            className="px-2 ml-1"
           />
         </label>
 
@@ -152,6 +156,7 @@ export function TransactionsEditForm({ transactionId }) {
             name="transactionCategory"
             value={category}
             onChange={handleCategoryChange}
+            className="ml-1"
           >
             <option key="0" value="" hidden></option>
             <option key="1" value="add-category">
@@ -165,7 +170,7 @@ export function TransactionsEditForm({ transactionId }) {
         <button
           type="button"
           onClick={handleSave}
-          className="py-1 px-2 bg-sky-600"
+          className="py-1 px-2 bg-sky-500 rounded"
         >
           Submit
         </button>

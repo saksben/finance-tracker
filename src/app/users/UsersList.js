@@ -32,10 +32,10 @@ export function UsersList() {
     return (
       <article key={user.id} className="flex gap-2 items-center">
         <p>{user.name}</p>
-        <button className="py-1 px-2 bg-slate-600" onClick={handleEdit}>
+        <button className="py-1 px-2 bg-slate-500 rounded" onClick={handleEdit}>
           Edit
         </button>
-        <button className="py-1 px-2 bg-red-600" onClick={handleDelete}>
+        <button className="py-1 px-2 bg-red-600 rounded" onClick={handleDelete}>
           Delete
         </button>
       </article>
@@ -43,7 +43,7 @@ export function UsersList() {
   });
 
   return (
-    <section className="flex flex-col gap-2 items-center">
+    <section className="flex flex-col gap-2 items-center mt-3">
       <h2>Users</h2>
       <UsersAddForm />
       {renderedUsers}

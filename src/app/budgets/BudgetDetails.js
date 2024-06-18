@@ -113,18 +113,38 @@ export function BudgetDetails({ budgetId }) {
     )
   );
 
+  const overbudgetStyle = "text-red-600";
+  const underbudgetStyle = "text-green-600";
+
   // For each user, show their estimate, adjusted estimate, actual paid, and how much they still owe
   const renderedUserEstimates = userEstimates.map((userEstimate) => {
     const actualPaid = userTotals[userEstimate.name]?.total || 0;
     const stillOwes = userEstimate.newEstimate - actualPaid;
+    const formattedStillOwes =
+    stillOwes > 0 ? (
+      <p> Still Owes: 
+        <span className={overbudgetStyle}>
+          {" $"}
+          {stillOwes}
+          {""}
+        </span>
+      </p>
+    ) : (
+      <p> Is Owed: 
+        <span className={underbudgetStyle}>
+          {" $"}
+          {Math.abs(stillOwes)}
+        </span>
+      </p>
+    );
     return (
-      <div key={userEstimate.id} className="flex">
+      <div key={userEstimate.id} className="flex gap-2 border ml-5">
         <p>
-          {userEstimate.name} Estimate: ${userEstimate.originalEstimate}
+          {userEstimate.name} Estimate: ${userEstimate.originalEstimate},
         </p>
-        <p>Adjusted Owes: ${userEstimate.newEstimate}</p>
-        <p>Actual Paid: ${actualPaid}</p>
-        <p>Still Owes: ${stillOwes}</p>
+        <p>Adjusted Owes: ${userEstimate.newEstimate},</p>
+        <p>Actual Paid: ${actualPaid},</p>
+        {formattedStillOwes}
       </div>
     );
   });
@@ -133,7 +153,7 @@ export function BudgetDetails({ budgetId }) {
   const renderedTypeTotals = Object.values(typeTotals).map(
     ({ type, total }) => (
       <div key={type} className="flex gap-2">
-        <p>Type: {type}</p>
+        <p>Type: {type},</p>
         <p>Total: ${total}</p>
       </div>
     )
@@ -141,13 +161,15 @@ export function BudgetDetails({ budgetId }) {
 
   // Alert message if user set overbudget alert
   const overbudget = budget.alertOverbudget && overUnderEst > 0 && (
-    <span className="bg-orange-500 text-black">Overbudget!</span>
+    <span className="bg-orange-500 text-white py-1 px-2 rounded">
+      Overbudget!
+    </span>
   );
 
   // Alert message if user set an alert for if expenses exceed a certain amount
   const overbudgetAmount = budget.alertOverAmount &&
     expensesTotalActual > budget.alertAmount && (
-      <span className="bg-orange-500 text-black">
+      <span className="bg-orange-500 text-white py-1 px-2 rounded">
         Over Amount of ${budget.alertAmount}!
       </span>
     );
@@ -158,29 +180,64 @@ export function BudgetDetails({ budgetId }) {
     dispatch(budgetEdited({ ...budget, overbudget: false }));
   }
 
+  const formattedOverUnderBudget =
+    overUnderEst > 0 ? (
+      <span className={overbudgetStyle}>
+        {"$("}
+        {overUnderEst}
+        {")"}
+      </span>
+    ) : (
+      <span className={underbudgetStyle}>
+        {"$"}
+        {overUnderEst}
+      </span>
+    );
+
+    const formattedUserBudget =
+    overUnderEst > 0 ? (
+      <span className={overbudgetStyle}>
+        {"$("}
+        {adjustmentPerUser}
+        {")"}
+      </span>
+    ) : (
+      <span className={underbudgetStyle}>
+        {"$"}
+        {adjustmentPerUser}
+      </span>
+    );
+
   return (
-    <div>
-      <h4>{budget.name}</h4>
-      {overbudget}
-      {overbudgetAmount}
-      {/* <p>Estimated Revenue: ${budget.estimatedRevenue}</p> */}
+    <div className="flex items-center justify-center">
       <div>
-        {/* <p>Categories:</p> */}
-        {/* {renderedCategories} */}
-        {renderedTypeTotals}
-        <p>
-          Total Paid: $
-          {Object.values(userTotals).reduce((sum, user) => sum + user.total, 0)}
-        </p>
-        <p>Total Estimate (Regularly Paid): ${totalCategoriesEstimate}</p>
-        <p>Actual Expenses Due: ${expensesTotalActual}</p>
-        <p>
-          Over/(Under) Budget: ${overUnderEst}. Adjustment per user: $
-          {adjustmentPerUser}
-        </p>
-        <p>User Estimates:</p>
-        {renderedUserEstimates}
-        <p>Still Owed: ${expensesTotalActual - allUsersPaidActual}</p>
+        <h3 className="mt-5">{budget.name}</h3>
+        <div className="my-3 flex gap-2">
+          {overbudget}
+          {overbudgetAmount}
+        </div>
+        {/* <p>Estimated Revenue: ${budget.estimatedRevenue}</p> */}
+        <div>
+          {/* <p>Categories:</p> */}
+          {/* {renderedCategories} */}
+          {renderedTypeTotals}
+          <p>
+            Total Paid: $
+            {Object.values(userTotals).reduce(
+              (sum, user) => sum + user.total,
+              0
+            )}
+          </p>
+          <p>Total Estimate (Regularly Paid): ${totalCategoriesEstimate}</p>
+          <p>Actual Expenses Due: ${expensesTotalActual}</p>
+          <p>
+            Over/(Under) Budget: {formattedOverUnderBudget}. Adjustment per
+            user: {formattedUserBudget}
+          </p>
+          <p>Still Owed: ${expensesTotalActual - allUsersPaidActual}</p>
+          <p>User Estimates:</p>
+          {renderedUserEstimates}
+        </div>
       </div>
     </div>
   );

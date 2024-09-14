@@ -1,43 +1,58 @@
 "use client";
 
-import { userEdited } from "../../lib/features/users/usersSlice";
+import {
+  fetchUserById,
+  updateUser,
+} from "../../lib/features/users/usersSlice";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // UsersEditForm component to update user
-export function UsersEditForm({ userId }) {
+export function UsersEditForm({ id }) {
+  console.log("Editing user with ID: ", id);
+
   const dispatch = useDispatch();
   const router = useRouter();
 
-  // Get the specific user from state by its id
-  const user = useSelector((state) =>
-    state.users.find((user) => user.id === userId)
-  );
+  const user = useSelector((state) => {
+    return state.users.users.find((user) => user.id === id);
+  });
+
+  const userStatus = useSelector((state) => state.users.status);
 
   // Input state
-  const [name, setName] = React.useState(user.name);
+  const [name, setName] = React.useState("");
+
+  React.useEffect(() => {
+    if (userStatus === "idle" || (!user && userStatus !== "loading")) {
+      dispatch(fetchUserById(id));
+    } else if (user) {
+      setName(user.name);
+    }
+  }, [dispatch, id, user, userStatus]);
 
   // Input change handler
   const handleNameChange = (e) => setName(e.target.value);
 
   // On save, update this user in store and go back to users page
-  const handleSave = () => {
-    if (name) {
-      dispatch(
-        userEdited({
-          id: userId,
-          name: name,
-        })
-      );
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(updateUser({ id, name })).unwrap();
+      router.push("/users");
+    } catch (error) {
+      console.error("Error updating user:", error);
     }
-    router.push("/users");
   };
+
+  if (userStatus === "loading") return <div>Loading...</div>;
+  if (userStatus === "failed") return <div>Error: {error}</div>;
 
   return (
     <div className="flex flex-col gap-2 items-center mt-3">
       <h4>Edit User</h4>
-      <form>
+      <form onSubmit={handleSave}>
         {/* User name */}
         <label htmlFor="userName">
           Name
@@ -51,11 +66,7 @@ export function UsersEditForm({ userId }) {
             className="ml-2 px-2"
           />
         </label>
-        <button
-          type="button"
-          onClick={handleSave}
-          className="ml-2 py-1 px-2 rounded bg-sky-500"
-        >
+        <button type="submit" className="ml-2 py-1 px-2 rounded bg-sky-500">
           Submit
         </button>
       </form>

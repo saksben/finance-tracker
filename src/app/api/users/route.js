@@ -15,10 +15,9 @@ export async function GET() {
   });
 }
 
+// Send POST request to the backend
 export async function POST(req) {
   const userData = await req.json();
-
-  // Send POST request to the backend
   const response = await fetch("http://localhost:3001/api/users", {
     method: "POST",
     headers: {

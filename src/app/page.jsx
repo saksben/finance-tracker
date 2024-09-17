@@ -2,7 +2,7 @@
 
 import React from "react";
 import { selectBudget, loadBudgets } from "../lib/features/budget/budgetSlice";
-import { selectTransaction } from "../lib/features/transactions/transactionsSlice";
+import { selectTransactions } from "../lib/features/transactions/transactionsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "../lib/utilities/cn";
 
@@ -13,7 +13,7 @@ import { cn } from "../lib/utilities/cn";
 // Dashboard page
 export default function Home() {
   // Import transactions state
-  const transactions = useSelector(selectTransaction);
+  const transactions = useSelector(selectTransactions);
   const budgets = useSelector(selectBudget);
   const dispatch = useDispatch();
 

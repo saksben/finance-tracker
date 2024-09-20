@@ -3,9 +3,9 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { budgetEdited } from "../../lib/features/budget/budgetSlice";
-import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
-import { selectUser } from "../../lib/features/users/usersSlice";
+import { budgetEdited, updateBudget } from "../../lib/features/budget/budgetSlice";
+import { fetchCategories, selectCategories, selectCategory } from "../../lib/features/transactions/categories/categorySlice";
+import { fetchUsers, selectUser, selectUsers } from "../../lib/features/users/usersSlice";
 
 // BudgetsEditForm component to edit budget
 export function BudgetsEditForm({ budgetId }) {
@@ -14,14 +14,16 @@ export function BudgetsEditForm({ budgetId }) {
 
   // Find this specific budget in state and select it for editing
   const budget = useSelector((state) =>
-    state.budgets.find((budget) => budget.id === budgetId)
+    state.budgets.budgets.find((budget) => budget.id === budgetId)
   );
 
   // Categories retrieved from Redux store
-  const stateCategories = useSelector(selectCategory);
+  const stateCategories = useSelector(selectCategories);
+  const categoryStatus = useSelector((state) => state.categories.status)
 
   // Users retrieved from Redux store
-  const stateUsers = useSelector(selectUser);
+  const stateUsers = useSelector(selectUsers);
+  const userStatus = useSelector((state) => state.users.status)
 
   // Initial state
   const [name, setName] = React.useState(budget.name);
@@ -56,6 +58,26 @@ export function BudgetsEditForm({ budgetId }) {
     budget.alertOverAmount
   );
   const [alertAmount, setAlertAmount] = React.useState(budget.alertAmount);
+
+  React.useEffect(() => {
+    if (categoryStatus === "idle") {
+      dispatch(fetchCategories());
+    }
+
+    if (userStatus === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [categoryStatus, userStatus, dispatch]);
+
+  React.useEffect(() => {
+    if (categoryStatus === "succeeded") {
+      setCategories(stateCategories);
+    }
+    if (userStatus === "succeeded") {
+      setUsers(stateUsers);
+    }
+  }, [stateCategories, categoryStatus, stateUsers, userStatus]);
+
 
   // Make a category option for each category in store
   const renderedStateCategories = categories.map((category) => (
@@ -93,29 +115,29 @@ export function BudgetsEditForm({ budgetId }) {
   };
   // When a user clicks a category, add the category to the user-selected list and remove it from available options
   const handleCategoryChange = (e) => {
-    const selectedCategoryId = e.target.value;
+    const selectedCategoryId = parseInt(e.target.value);
     const selectedCategory = categories.find(
       (cat) => cat.id === selectedCategoryId
     );
 
     if (selectedCategory) {
-      setSelectedCategories([
-        ...selectedCategories,
+      setSelectedCategories((prevSelectedCategories) => [
+        ...prevSelectedCategories,
         { ...selectedCategory, estimate: 0 },
-      ]),
-        setCategories(
-          categories.filter((cat) => cat.id !== selectedCategoryId)
-        );
+      ]);
+      setCategories((prevCategories) =>
+        prevCategories.filter((cat) => cat.id !== selectedCategoryId)
+      );
     }
   };
   // When a user clicks a user, add the user to the user-selected list and remove it from available options
   const handleUsersChange = (e) => {
-    const selectedUserId = e.target.value;
+    const selectedUserId = parseInt(e.target.value);
     const selectedUser = users.find((user) => user.id === selectedUserId);
-
     if (selectedUser) {
       setSelectedUsers([...selectedUsers, { ...selectedUser, estimate: 0 }]),
         setUsers(users.filter((user) => user.id !== selectedUserId));
+        
     }
   };
 
@@ -219,15 +241,22 @@ export function BudgetsEditForm({ budgetId }) {
   const handleSave = (e) => {
     e.preventDefault();
     dispatch(
-      budgetEdited({
+      updateBudget({
         id: budgetId,
         name: name,
-        estimatedRevenue: estRev,
-        categories: selectedCategories,
-        users: selectedUsers,
+        estimatedRevenue: parseInt(estRev),
+        categories: selectedCategories.map(cat => ({
+          id: cat.id,
+          estimate: parseInt(cat.estimate)
+        })),
+        users: selectedUsers.map(user => ({
+          id: user.id,
+          estimate: parseInt(user.estimate)
+        })),
         alertOverbudget: overbudgetAlert,
         alertOverAmount: alertOverAmount,
-        alertAmount: alertAmount,
+        alertAmount: parseInt(alertAmount),
+        overbudget: overbudgetAlert
       })
     );
     router.push("/budgets");

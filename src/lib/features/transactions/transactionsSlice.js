@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // Get today's date for initial slice and format it as select element
 const today = new Date();
@@ -7,106 +7,119 @@ const month = String(today.getMonth() + 1).padStart(2, "0");
 const day = String(today.getDate()).padStart(2, "0");
 const todayDate = `${year}-${month}-${day}`;
 
-// Initial state of transactions
-const initialState = [
-  {
-    id: "1",
-    date: "2024-06-04",
-    user: "Me",
-    type: "Revenue",
-    amount: 1065,
-    description: "pymt",
-    category: "Budget",
-  },
-  {
-    id: "2",
-    date: "2024-06-05",
-    user: "Jonathan",
-    type: "Revenue",
-    amount: 1204,
-    description: "pymt",
-    category: "Budget",
-  },
-  {
-    id: "3",
-    date: "2024-06-08",
-    user: "Dad",
-    type: "Revenue",
-    amount: 0,
-    description: "pymt",
-    category: "Budget",
-  },
-  {
-    id: "4",
-    date: "2024-06-11",
-    type: "Expense",
-    amount: 3942,
-    description: "expenses",
-    category: "Budget",
-  },
-  {
-    id: "5",
-    date: "2024-06-15",
-    type: "Expense",
-    amount: 3000,
-    description: "rent",
-    category: "Rent",
-  },
-  {
-    id: "6",
-    date: "2024-06-16",
-    type: "Expense",
-    amount: 50,
-    description: "Pizza",
-    category: "Food",
-  },
-  {
-    id: "7",
-    date: "2024-06-17",
-    user: "Me",
-    type: "Revenue",
-    amount: 1500,
-    description: "pymt",
-    category: "Rent",
-  },
-];
+// Async thunks to fetch, add, edit, and delete transactions from the backend
+export const fetchTransactions = createAsyncThunk(
+  "transactions/fetchTransactions",
+  async () => {
+    const response = await fetch("/api/transactions");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json()
+    console.log('Fetched transactions:', data)
+    return data
+  }
+);
+
+export const fetchTransactionById = createAsyncThunk(
+  "transactions/fetchTransactionById",
+  async (id) => {
+    const response = await fetch(`/api/transactions/${id}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch transaction");
+    }
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const addTransaction = createAsyncThunk(
+  "transactions/addTransaction",
+  async (newTransaction) => {
+    const response = await fetch("api/transactions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTransaction),
+    });
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  }
+);
+
+export const updateTransaction = createAsyncThunk(
+  "transactions/updateTransaction",
+  async ({ id, ...transactionData }) => {
+    const response = await fetch(`/api/transactions/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...transactionData }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to update transaction");
+    }
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const deleteTransaction = createAsyncThunk(
+  "transactions/deleteTransaction",
+  async (id) => {
+    const response = await fetch(`/api/transactions/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete transaction");
+    }
+    return id;
+  }
+);
+
+const initialState = {
+  transactions: [],
+  status: 'idle',
+  error: null,
+}
 
 // Redux slice pertaining to transactions
 export const transactionsSlice = createSlice({
   name: "transactions",
   initialState,
-  reducers: {
-    // Action to add a transaction
-    transactionAdded(state, action) {
-      state.push(action.payload);
-    },
-    // Action to edit a transaction
-    transactionEdited(state, action) {
-      const { id, date, amount, description, type, category, user } =
-        action.payload;
-      const foundTransaction = state.find(
-        (transaction) => transaction.id === id
-      );
-      if (foundTransaction) {
-        foundTransaction.date = date;
-        foundTransaction.user = user;
-        foundTransaction.amount = amount;
-        foundTransaction.description = description;
-        foundTransaction.type = type;
-        foundTransaction.category = category;
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+    .addCase(fetchTransactions.fulfilled, (state, action) => {
+      state.status = 'succeeded'
+      state.transactions = action.payload
+    })
+    .addCase(fetchTransactionById.fulfilled, (state, action) => {
+      const fetchedTransaction = action.payload
+      const existingTransaction = state.transactions.find((transaction) => transaction.id === fetchedTransaction.id)
+      if (existingTransaction) {
+        Object.assign(existingTransaction, fetchedTransaction)
+      } else {
+        state.transactions.push(fetchedTransaction)
       }
-    },
-    // Action to remove a transaction
-    transactionRemoved(state, action) {
-      const { id } = action.payload;
-      return state.filter((transaction) => transaction.id !== id);
-    },
-  },
+    })
+    .addCase(addTransaction.fulfilled, (state, action) => {
+      state.transactions.push(action.payload)
+    })
+    .addCase(updateTransaction.fulfilled, (state, action) => {
+      const updatedTransaction = action.payload
+      const existingTransaction = state.transactions.find((transaction) => transaction.id === updatedTransaction.id)
+      if (existingTransaction) {
+        Object.assign(existingTransaction, updatedTransaction)
+      }
+    })
+    .addCase(deleteTransaction.fulfilled, (state, action) => {
+      const transactionId = action.payload
+      state.transactions = state.transactions.filter((transaction) => transaction.id !== transactionId)
+    })
+  }
 });
 
-export const { transactionAdded, transactionEdited, transactionRemoved } =
-  transactionsSlice.actions;
-
-export const selectTransaction = (state) => state.transactions;
+export const selectTransactions = (state) => state.transactions.transactions;
 
 export default transactionsSlice.reducer;

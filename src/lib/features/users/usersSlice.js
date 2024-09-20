@@ -22,15 +22,20 @@ export const fetchUserById = createAsyncThunk(
 )
 
 export const addUser = createAsyncThunk("users/addUser", async (newUser) => {
-  const response = await fetch("/api/users", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newUser),
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    const response = await fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.details || errorData.message || "Network response was not ok");
+    }
+    return response.json();
+  } catch (error) {
+    throw new Error(error.message);
   }
-  return response.json();
 });
 
 export const updateUser = createAsyncThunk(

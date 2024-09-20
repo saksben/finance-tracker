@@ -2,18 +2,27 @@
 
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { transactionAdded } from "../../lib/features/transactions/transactionsSlice";
+import {
+  addTransaction,
+  selectTransactions,
+  transactionAdded,
+} from "../../lib/features/transactions/transactionsSlice";
 import { nanoid } from "@reduxjs/toolkit";
 import { useRouter } from "next/navigation";
-import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
-import { selectUser } from "../../lib/features/users/usersSlice";
+import {
+  fetchCategories,
+  selectCategories,
+} from "../../lib/features/transactions/categories/categorySlice";
+import { fetchUsers, selectUsers } from "../../lib/features/users/usersSlice";
 
 // TransactionsAddForm component to add a transaction to the list
 export function TransactionsAddForm() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const categories = useSelector(selectCategory);
-  const users = useSelector(selectUser);
+  const categories = useSelector(selectCategories);
+  const categoryStatus = useSelector((state) => state.categories.status);
+  const users = useSelector(selectUsers);
+  const userStatus = useSelector((state) => state.users.status);
 
   // Format today's date as select element
   const today = new Date();
@@ -23,11 +32,11 @@ export function TransactionsAddForm() {
 
   // Input states
   const [date, setDate] = React.useState(`${year}-${month}-${day}`);
-  const [user, setUser] = React.useState("Me");
+  const [user, setUser] = React.useState(1);
   const [amount, setAmount] = React.useState(0);
   const [description, setDescription] = React.useState("Transaction");
   const [type, setType] = React.useState("Expense");
-  const [category, setCategory] = React.useState("Gasoline");
+  const [category, setCategory] = React.useState(1);
 
   // Input change handlers
   const handleDateChange = (e) => setDate(e.target.value);
@@ -44,28 +53,46 @@ export function TransactionsAddForm() {
     }
   };
 
-  // Categories from state
+  React.useEffect(() => {
+    if (categoryStatus === "idle") {
+      dispatch(fetchCategories());
+    }
+  }, [categoryStatus, dispatch]);
+
+  React.useEffect(() => {
+    if (userStatus === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [userStatus, dispatch]);
+
+  // Categories from db
   const renderedCategories = categories.map((cat) => (
-    <option key={cat.id}>{cat.name}</option>
+    <option key={cat.id} value={cat.id}>
+      {cat.name}
+    </option>
   ));
 
-  // Users from state
+  // Users from db
   const renderedUsers = users.map((user) => (
-    <option key={user.id}>{user.name}</option>
+    <option key={user.id} value={user.id}>
+      {user.name}
+    </option>
   ));
 
   // Button submit handler, add transaction data to Redux store
   const handleSubmit = (e) => {
     e.preventDefault();
+    const userId = Number(user);
+    const categoryId = Number(category);
+
     dispatch(
-      transactionAdded({
-        id: nanoid(),
+      addTransaction({
         date,
-        user,
-        amount,
+        user: userId,
+        amount: Number(amount),
         description,
         type,
-        category,
+        category: categoryId,
       })
     );
     setAmount(0), setDescription("");
@@ -160,8 +187,7 @@ export function TransactionsAddForm() {
             onChange={handleCategoryChange}
             className="ml-2"
           >
-            <option key="0" value="" hidden></option>
-            <option key="1" value="add-category">
+            <option key="0" value="add-category">
               + Add Category
             </option>
             {renderedCategories}

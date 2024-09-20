@@ -1,12 +1,15 @@
 "use client";
 
 import { nanoid } from "@reduxjs/toolkit";
-import { budgetAdd } from "../../lib/features/budget/budgetSlice";
+import { addBudget, budgetAdd } from "../../lib/features/budget/budgetSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { selectCategory } from "../../lib/features/transactions/categories/categorySlice";
-import { selectUser } from "../../lib/features/users/usersSlice";
+import {
+  fetchCategories,
+  selectCategories,
+} from "../../lib/features/transactions/categories/categorySlice";
+import { fetchUsers, selectUsers } from "../../lib/features/users/usersSlice";
 
 // BudgetsAddForm component to add budgets
 export function BudgetsAddForm() {
@@ -14,10 +17,12 @@ export function BudgetsAddForm() {
   const router = useRouter();
 
   // Categories retrieved from Redux store
-  const stateCategories = useSelector(selectCategory);
+  const stateCategories = useSelector(selectCategories);
+  const categoryStatus = useSelector((state) => state.categories.status);
 
   // Users retrieved from Redux store
-  const stateUsers = useSelector(selectUser);
+  const stateUsers = useSelector(selectUsers);
+  const userStatus = useSelector((state) => state.users.status);
 
   // Initial state
   const [name, setName] = React.useState("");
@@ -34,6 +39,25 @@ export function BudgetsAddForm() {
   const [overbudgetAlert, setOverBudgetAlert] = React.useState(false);
   const [alertOverAmount, setAlertOverAmount] = React.useState(false);
   const [alertAmount, setAlertAmount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (categoryStatus === "idle") {
+      dispatch(fetchCategories());
+    }
+
+    if (userStatus === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [categoryStatus, userStatus, dispatch]);
+
+  React.useEffect(() => {
+    if (categoryStatus === "succeeded") {
+      setCategories(stateCategories);
+    }
+    if (userStatus === "succeeded") {
+      setUsers(stateUsers);
+    }
+  }, [stateCategories, categoryStatus, stateUsers, userStatus]);
 
   // Make a category option for each category in store
   const renderedStateCategories = categories.map((category) => (
@@ -65,30 +89,30 @@ export function BudgetsAddForm() {
   };
   // When a user clicks a category, add the category to the user-selected list and remove it from available options
   const handleCategory = (e) => {
-    const selectedCategoryId = e.target.value;
+    const selectedCategoryId = parseInt(e.target.value);
     const selectedCategory = categories.find(
       (cat) => cat.id === selectedCategoryId
     );
 
     if (selectedCategory) {
-      setSelectedCategories([
-        ...selectedCategories,
+      setSelectedCategories((prevSelectedCategories) => [
+        ...prevSelectedCategories,
         { ...selectedCategory, estimate: 0 },
-      ]),
-        setCategories(
-          categories.filter((cat) => cat.id !== selectedCategoryId)
-        );
+      ]);
+      setCategories((prevCategories) =>
+        prevCategories.filter((cat) => cat.id !== selectedCategoryId)
+      );
     }
   };
 
   // When a user clicks a user, add the user to the user-selected list and remove it from available options
   const handleUsers = (e) => {
-    const selectedUserId = e.target.value;
+    const selectedUserId = parseInt(e.target.value);
     const selectedUser = users.find((user) => user.id === selectedUserId);
-
     if (selectedUser) {
       setSelectedUsers([...selectedUsers, { ...selectedUser, estimate: 0 }]),
         setUsers(users.filter((user) => user.id !== selectedUserId));
+        
     }
   };
 
@@ -129,7 +153,7 @@ export function BudgetsAddForm() {
       )
     );
   };
-
+  console.log("selected categories: ", selectedCategories);
   // An estimable buget item when selected by user to include in budget calculations
   const renderedItem = selectedCategories.map((cat) => {
     return (
@@ -181,15 +205,21 @@ export function BudgetsAddForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(
-      budgetAdd({
-        id: nanoid(),
+      addBudget({
         name: name,
-        estimatedRevenue: estRev,
-        categories: selectedCategories,
-        users: selectedUsers,
+        estimatedRevenue: parseInt(estRev),
+        categories: selectedCategories.map(cat => ({
+          id: cat.id,
+          estimate: parseInt(cat.estimate)
+        })),
+        users: selectedUsers.map(user => ({
+          id: user.id,
+          estimate: parseInt(user.estimate)
+        })),
         alertOverbudget: overbudgetAlert,
         alertOverAmount: alertOverAmount,
-        alertAmount: alertAmount,
+        alertAmount: parseInt(alertAmount),
+        overbudget: overbudgetAlert
       })
     );
     router.push("/budgets");

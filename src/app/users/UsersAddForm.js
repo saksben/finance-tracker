@@ -23,7 +23,12 @@ export function UsersAddForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (name) {
-      dispatch(addUser({ name }));
+      console.log('Submitting user:', { name });
+      try {
+        dispatch(addUser({ name }));
+      } catch (error) {
+        console.error('Error dispatching addUser:', error.message);
+      }
       setName("");
     }
   };

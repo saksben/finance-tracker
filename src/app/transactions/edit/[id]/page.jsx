@@ -7,7 +7,7 @@ import { TransactionsEditForm } from "../../TransactionsEditForm";
 export default function EditTransaction() {
   // Get the transaction's id from the url params and pass it to the edit form to specify the transaction
   const params = useParams();
-  const id = params.id;
+  const id = parseInt(params.id);
 
   return id ? (
     <TransactionsEditForm transactionId={id} />

@@ -1,24 +1,47 @@
 "use client";
 
-import { budgetEdited } from "../../lib/features/budget/budgetSlice";
+import React from "react";
+import {
+  budgetEdited,
+  fetchBudgetById,
+  updateBudget,
+} from "../../lib/features/budget/budgetSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchTransactions,
+  selectTransactions,
+} from "@/lib/features/transactions/transactionsSlice";
 
 // BudgetDetails component to show a budget's details
 export function BudgetDetails({ budgetId }) {
   const dispatch = useDispatch();
   // Get this specific budget from Redux
-  const budget = useSelector((state) =>
-    state.budgets.find((budget) => budget.id === budgetId)
-  );
+  const budget = useSelector((state) => {
+    return state.budgets.budgets.find((budget) => budget.id === budgetId);
+  });
+  const transactionStatus = useSelector((state) => state.transactions.status);
+
+  React.useEffect(() => {
+    if (transactionStatus === "idle") {
+      dispatch(fetchTransactions());
+    }
+  }, [transactionStatus, dispatch]);
 
   // Find all transactions related to all selected categories
   const relatedTransactions = useSelector((state) => {
-    return state.transactions.filter((transaction) =>
+    if (!budget || !budget.categories) {
+      return [];
+    }
+    return state.transactions.transactions.filter((transaction) =>
       budget.categories.some((budgetCategory) => {
-        return budgetCategory.name === transaction.category;
+        return budgetCategory.categoryId === transaction.category.id;
       })
     );
   });
+
+  React.useEffect(() => {
+    dispatch(fetchBudgetById(budgetId));
+  }, [dispatch, budgetId]);
 
   // Error handling if budget not found
   if (!budget) {
@@ -55,21 +78,21 @@ export function BudgetDetails({ budgetId }) {
 
   // Calculate the total dollar amount of all related transactions from each user
   const userTotals = relatedTransactions.reduce((acc, transaction) => {
-    // Calculate totals for all users as long as they are part of the budget's selected users
-    if (budget.users.some((user) => user.name === transaction.user)) {
-      if (!acc[transaction.user]) {
-        acc[transaction.user] = {
-          user: transaction.user,
-          total: 0,
-          estimate: 0,
-          transactions: [],
-        };
-      }
-
-      acc[transaction.user].total += transaction.amount;
-      acc[transaction.user].transactions.push(transaction);
-      allUsersPaidActual += transaction.amount;
+  // Calculate totals for all users as long as they are part of the budget's selected users
+  if (budget.users.some((budgetUser) => budgetUser.userId === transaction.userId)) {
+    if (!acc[transaction.user.id]) {
+      acc[transaction.user.id] = {
+        user: transaction.user,
+        total: 0,
+        estimate: 0,
+        transactions: [],
+      };
     }
+
+    acc[transaction.user.id].total += transaction.amount;
+    acc[transaction.user.id].transactions.push(transaction);
+    allUsersPaidActual += transaction.amount;
+  }
     return acc;
   }, {});
 
@@ -80,12 +103,12 @@ export function BudgetDetails({ budgetId }) {
   let adjustmentPerUser = overUnderEst / numUsers;
 
   // User info of their estimates
-  const userEstimates = budget.users.map((user) => {
-    const newEstimate = user.estimate + adjustmentPerUser;
+  const userEstimates = budget.users.map((budgetUser) => {
+    const newEstimate = budgetUser.estimate + adjustmentPerUser;
     return {
-      id: user.id,
-      name: user.name,
-      originalEstimate: user.estimate,
+      id: budgetUser.userId,
+      name: budgetUser.user.name,
+      originalEstimate: budgetUser.estimate,
       newEstimate,
     };
   });
@@ -93,7 +116,7 @@ export function BudgetDetails({ budgetId }) {
   // Display each selected category and its estimate
   const renderedCategories = budget.categories.map((category) => (
     <p key={category.id} className="flex gap-2">
-      <span>{category.name}</span>
+      <span>{category.category.name}</span>
       <span>Estimate: ${category.estimate}</span>
     </p>
   ));
@@ -101,12 +124,12 @@ export function BudgetDetails({ budgetId }) {
   // Display the total dollar amount for all related transactions of each user
   const renderedUserTotals = Object.values(userTotals).map(
     ({ user, total, transactions }) => (
-      <div key={user} className="flex gap-2">
-        <p>User: {user}</p>
+      <div key={user.id} className="flex gap-2">
+        <p>User: {user.name}</p>
         <p>Actual Paid: ${total}</p>
         {transactions.map((transaction) => (
           <div key={transaction.id}>
-            <p>Category: {transaction.category}</p>
+            <p>Category: {transaction.category.name}</p>
           </div>
         ))}
       </div>
@@ -118,25 +141,29 @@ export function BudgetDetails({ budgetId }) {
 
   // For each user, show their estimate, adjusted estimate, actual paid, and how much they still owe
   const renderedUserEstimates = userEstimates.map((userEstimate) => {
-    const actualPaid = userTotals[userEstimate.name]?.total || 0;
+    const actualPaid = userTotals[userEstimate.id]?.total || 0;
     const stillOwes = userEstimate.newEstimate - actualPaid;
     const formattedStillOwes =
-    stillOwes > 0 ? (
-      <p> Still Owes: 
-        <span className={overbudgetStyle}>
-          {" $"}
-          {stillOwes}
-          {""}
-        </span>
-      </p>
-    ) : (
-      <p> Is Owed: 
-        <span className={underbudgetStyle}>
-          {" $"}
-          {Math.abs(stillOwes)}
-        </span>
-      </p>
-    );
+      stillOwes > 0 ? (
+        <p>
+          {" "}
+          Still Owes:
+          <span className={overbudgetStyle}>
+            {" $"}
+            {stillOwes}
+            {""}
+          </span>
+        </p>
+      ) : (
+        <p>
+          {" "}
+          Is Owed:
+          <span className={underbudgetStyle}>
+            {" $"}
+            {Math.abs(stillOwes)}
+          </span>
+        </p>
+      );
     return (
       <div key={userEstimate.id} className="flex gap-2 border ml-5">
         <p>
@@ -175,9 +202,9 @@ export function BudgetDetails({ budgetId }) {
     );
 
   if (budget.alertOverbudget && overUnderEst > 0) {
-    dispatch(budgetEdited({ ...budget, overbudget: true }));
+    dispatch(updateBudget({ ...budget, overbudget: true }));
   } else if (!(budget.alertOverbudget && overUnderEst > 0)) {
-    dispatch(budgetEdited({ ...budget, overbudget: false }));
+    dispatch(updateBudget({ ...budget, overbudget: false }));
   }
 
   const formattedOverUnderBudget =
@@ -194,7 +221,7 @@ export function BudgetDetails({ budgetId }) {
       </span>
     );
 
-    const formattedUserBudget =
+  const formattedUserBudget =
     overUnderEst > 0 ? (
       <span className={overbudgetStyle}>
         {"$("}
@@ -207,7 +234,7 @@ export function BudgetDetails({ budgetId }) {
         {adjustmentPerUser}
       </span>
     );
-
+console.log(relatedTransactions)
   return (
     <div className="flex items-center justify-center">
       <div>

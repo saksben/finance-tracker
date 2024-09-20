@@ -1,4 +1,4 @@
-import { selectTransaction } from "../../lib/features/transactions/transactionsSlice";
+import { selectTransactions } from "../../lib/features/transactions/transactionsSlice";
 import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
 import React from "react";
@@ -12,7 +12,7 @@ Chart.defaults.color = "#FFFFFF"
 
 // TransactionsChart component to make a chart of all transactions
 export function TransactionsChart() {
-  const transactions = useSelector(selectTransaction);
+  const transactions = useSelector(selectTransactions);
   // Organizes transactions by date and type and aggregates their amounts. Memoizes transactions data so it doesn't need to re-render each time
   const groupedTransactions = React.useMemo(() => {
     const grouped = {};

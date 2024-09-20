@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  selectTransaction,
-  transactionRemoved,
-  transactionEdited,
+  selectTransactions,
+  fetchTransactions,
+  deleteTransaction,
 } from "../../lib/features/transactions/transactionsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { TransactionsAddForm } from "./TransactionsAddForm";
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { TransactionsChart } from "./TransactionsChart";
 import Papa from "papaparse";
 import { cn } from "../../lib/utilities/cn";
+import React from "react";
 
 // TODO: put in a table to organize and track inflows and outflows
 // TODO: add date once for readability?
@@ -22,63 +23,91 @@ export function TransactionsList() {
   const router = useRouter();
 
   // Select transactions from store
-  const transactions = useSelector(selectTransaction);
+  const transactions = useSelector(selectTransactions);
+  const transactionStatus = useSelector((state) => state.transactions.status);
+
+  React.useEffect(() => {
+    if (transactionStatus === "idle") {
+      dispatch(fetchTransactions());
+    }
+  }, [transactionStatus, dispatch]);
 
   // Create a transaction for each one existing in state
-  const renderedTransactions = transactions.map((transaction) => {
-    // Format the transaction's date to human readable
-    const year = transaction.date.slice(0, 4);
-    const month = transaction.date.slice(5, 7);
-    const day = transaction.date.slice(8, 10);
+  const renderedTransactions = Array.isArray(transactions)
+    ? transactions.map((transaction) => {
+        // Format the transaction's date to human readable
+        const year = transaction.date.slice(0, 4);
+        const month = transaction.date.slice(5, 7);
+        const day = transaction.date.slice(8, 10);
 
-    // Edit button handler, edit transaction with this id from state
-    const handleEdit = () => {
-      router.push(`/transactions/edit/${transaction.id}`);
-    };
+        // Edit button handler, edit transaction with this id from state
+        const handleEdit = () => {
+          router.push(`/transactions/edit/${transaction.id}`);
+        };
 
-    // Delete Button handler, delete transaction with this id from state
-    const handleDelete = () => {
-      dispatch(
-        transactionRemoved({
-          id: transaction.id,
-        })
-      );
-    };
+        // Delete Button handler, delete transaction with this id from state
+        const handleDelete = async () => {
+          dispatch(deleteTransaction(transaction.id));
+        };
+        return (
+          // Return a single transaction row
+          <article
+            key={transaction.id}
+            className="flex flex-col sm:flex-row items-center justify-center mb-1"
+          >
+            <div className="flex gap-1 sm:mr-1">
+              <p>{`${month}-${day}-${year}`}</p>
+              <p>{transaction.user?.name}</p>
+              <p
+                className={cn(
+                  transaction.type === "Revenue"
+                    ? "text-green-600"
+                    : "text-red-600"
+                )}
+              >
+                {transaction.type}
+              </p>
+              <p>${transaction.amount}</p>
+              <p>{transaction.description}</p>
+              <p>{transaction.category?.name}</p>
+            </div>
 
-    return (
-      // Return a single transaction row
-      <article key={transaction.id} className="flex flex-col sm:flex-row items-center justify-center mb-1">
-        <div className="flex gap-1 sm:mr-1">
-          <p>{`${month}-${day}-${year}`}</p>
-          <p>{transaction.user}</p>
-          <p className={cn(transaction.type === "Revenue" ? "text-green-600" : "text-red-600")}>{transaction.type}</p>
-          <p>${transaction.amount}</p>
-          <p>{transaction.description}</p>
-          <p>{transaction.category}</p>
-        </div>
-
-        <div className="flex gap-1">
-          <button className="py-1 px-2 bg-slate-500 rounded" onClick={handleEdit}>
-            Edit
-          </button>
-          <button className="py-1 px-2 bg-red-600 rounded" onClick={handleDelete}>
-            Delete
-          </button>
-        </div>
-      </article>
-    );
-  });
+            <div className="flex gap-1">
+              <button
+                className="py-1 px-2 bg-slate-500 rounded"
+                onClick={handleEdit}
+              >
+                Edit
+              </button>
+              <button
+                className="py-1 px-2 bg-red-600 rounded"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </article>
+        );
+      })
+    : null;
 
   // Export transaction data to csv
   const exportCsv = (transactions) => {
-    const csvTransactions = transactions.map((transaction) => ({
-      Date: transaction.date,
-      User: transaction.user,
-      Type: transaction.type,
-      Amount: transaction.amount,
-      Description: transaction.description,
-      Category: transaction.category,
-    }));
+    const csvTransactions = transactions.map((transaction) => {
+      // Format the transaction's date to human readable
+      const year = transaction.date.slice(0, 4);
+      const month = transaction.date.slice(5, 7);
+      const day = transaction.date.slice(8, 10);
+
+      return {
+        Date: `${month}/${day}/${year}`,
+        User: transaction.user?.name,
+        Type: transaction.type,
+        Amount: transaction.amount,
+        Description: transaction.description,
+        Category: transaction.category.name,
+      };
+    });
     const csv = Papa.unparse(csvTransactions);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -95,7 +124,10 @@ export function TransactionsList() {
       <section className="flex flex-col items-center w-11/12">
         <h2 className="py-5">Transactions</h2>
         <TransactionsAddForm />
-        <button className="bg-sky-500 px-2 py-1 rounded my-3" onClick={() => exportCsv(transactions)}>
+        <button
+          className="bg-sky-500 px-2 py-1 rounded my-3"
+          onClick={() => exportCsv(transactions)}
+        >
           Export to CSV
         </button>
         <span className="border-b mb-5">{renderedTransactions}</span>

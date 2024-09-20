@@ -6,6 +6,6 @@ import { BudgetsEditForm } from "../../BudgetsEditForm";
 // Budget edit page
 export default function BudgetEdit() {
     const params = useParams()
-    const budgetId = params.id
+    const budgetId = parseInt(params.id)
   return <BudgetsEditForm budgetId={budgetId}/>;
 }

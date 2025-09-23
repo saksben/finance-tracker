@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 // Send GET request to the backend (findOne)
 export async function GET(req, { params }) {
   const { id } = params;
 
-  const response = await fetch(`http://localhost:3001/api/users/${id}`, {
+  const response = await fetch(`${API_URL}/api/users/${id}`, {
     method: "GET",
   });
   if (!response.ok) {
@@ -23,7 +25,7 @@ export async function PUT(req, { params }) {
 
   try {
     // Forward request to backend service
-    const response = await fetch(`http://localhost:3001/api/users/${id}`, {
+    const response = await fetch(`${API_URL}/api/users/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +52,7 @@ export async function DELETE(req, { params }) {
   const { id } = params;
 
   try {
-    const response = await fetch(`http://localhost:3001/api/users/${id}`, {
+    const response = await fetch(`${API_URL}/api/users/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {

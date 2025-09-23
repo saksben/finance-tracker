@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 // Send GET request to backend (findOne)
 export async function GET(req, { params }) {
   const { id } = params;
-  const response = await fetch(`http://localhost:3001/api/transactions/${id}`, {
+  const response = await fetch(`${API_URL}/api/transactions/${id}`, {
     method: "GET",
   });
   if (!response.ok) {
@@ -25,7 +27,7 @@ export async function PUT(req, { params }) {
 
   try {
     const response = await fetch(
-      `http://localhost:3001/api/transactions/${id}`,
+      `${API_URL}/api/transactions/${id}`,
       {
         method: "PUT",
         headers: {
@@ -56,7 +58,7 @@ export async function DELETE(req, { params }) {
   const { id } = params;
   try {
     const response = await fetch(
-      `http://localhost:3001/api/transactions/${id}`,
+      `${API_URL}/api/transactions/${id}`,
       {
         method: "DELETE",
       }

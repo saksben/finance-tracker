@@ -1,9 +1,11 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 import { NextResponse } from "next/server";
 
 // Send GET request to backend (findOne)
 export async function GET(req, { params }) {
   const { id } = params;
-  const response = await fetch(`http://localhost:3001/api/budgets/${id}`, {
+  const response = await fetch(`${API_URL}/api/budgets/${id}`, {
     method: "GET",
   });
   if (!response.ok) {
@@ -22,7 +24,7 @@ export async function PUT(req, { params }) {
   console.log("Updating budget with ID:", id);
   console.log("budgetData:", budgetData);
   try {
-    const response = await fetch(`http://localhost:3001/api/budgets/${id}`, {
+    const response = await fetch(`${API_URL}/api/budgets/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +51,7 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
   const { id } = params;
   try {
-    const response = await fetch(`http://localhost:3001/api/budgets/${id}`, {
+    const response = await fetch(`${API_URL}/api/budgets/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {

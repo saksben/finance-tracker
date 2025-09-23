@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 // Send GET request to the backend
 export async function GET() {
   // const users = [{id: 1, name: 'John Doe'}, {id: 2, name: 'Jane Smith'}] // Hard coded db
-  const response = await fetch("http://localhost:3001/api/users", {
+  const response = await fetch(`${API_URL}/api/users`, {
     method: "GET",
   });
   const users = await response.json();
@@ -19,7 +21,7 @@ export async function GET() {
 export async function POST(req) {
   try {
     const userData = await req.json();
-    const response = await fetch("http://localhost:3001/api/users", {
+    const response = await fetch(`${API_URL}/api/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

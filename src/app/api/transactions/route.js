@@ -1,6 +1,8 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 // Send GET response to backend
 export async function GET() {
-  const response = await fetch("http://localhost:3001/api/transactions", {
+  const response = await fetch(`${API_URL}/api/transactions`, {
     method: "GET",
   });
   const transactions = await response.json();
@@ -16,7 +18,7 @@ export async function GET() {
 export async function POST(req) {
   const transactionData = await req.json();
   const response = await fetch(
-    "http://localhost:3001/api/transactions",
+    `${API_URL}/api/transactions`,
     {
       method: "POST",
       headers: {

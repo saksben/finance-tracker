@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { selectBudget, loadBudgets } from "../lib/features/budget/budgetSlice";
+import {
+  selectBudgets,
+  loadBudgets,
+  fetchBudgets,
+} from "../lib/features/budget/budgetSlice";
 import { selectTransactions } from "../lib/features/transactions/transactionsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "../lib/utilities/cn";
@@ -14,12 +18,14 @@ import { cn } from "../lib/utilities/cn";
 export default function Home() {
   // Import transactions state
   const transactions = useSelector(selectTransactions);
-  const budgets = useSelector(selectBudget);
+  // const {budgets, loading} = useSelector((state) => state.budgets);
+  const budgets = useSelector(selectBudgets)
   const dispatch = useDispatch();
 
   React.useEffect(() => {
     // Load budgets with transactions when the component mounts
-    dispatch(loadBudgets({ budgets, transactions }));
+    // dispatch(loadBudgets({ budgets, transactions }));
+    dispatch(fetchBudgets());
   }, [dispatch]); // Says it's missing dependencies, but using useCallback and playing with dependencies either gives same warning or infinite loop error
 
   let totalRevenue = 0;
@@ -34,6 +40,8 @@ export default function Home() {
     }
   }
 
+  console.log("budgets:", budgets);
+
   // If any budget is overbudget, flag overbudget alert
   let overbudget = false;
   for (let budget of budgets) {
@@ -46,8 +54,9 @@ export default function Home() {
     totalRevenue - totalExpenses >= 0 ? "text-green-600" : "text-red-600"
   );
 
-  const bottomLine = totalRevenue - totalExpenses
-  const bottomLineFormatted = bottomLine >= 0 ? bottomLine : "(" + Math.abs(bottomLine) + ")"
+  const bottomLine = totalRevenue - totalExpenses;
+  const bottomLineFormatted =
+    bottomLine >= 0 ? bottomLine : "(" + Math.abs(bottomLine) + ")";
 
   return (
     <main className="flex flex-col items-center">
@@ -66,9 +75,7 @@ export default function Home() {
         </h3>
         <h3 className="text-black">
           Bottom Line:{" "}
-          <span className={bottomLineStyles}>
-            ${bottomLineFormatted}
-          </span>
+          <span className={bottomLineStyles}>${bottomLineFormatted}</span>
         </h3>
       </div>
     </main>

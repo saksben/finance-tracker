@@ -135,44 +135,44 @@ const calculateOverbudget = (budget, transactions = []) => {
 export const budgetSlice = createSlice({
   name: "budgets",
   initialState,
-  // reducers: {
-  //   // Action to add a budget to state
-  //   budgetAdd(state, action) {
-  //     state.push(action.payload);
-  //   },
-  //   // Action to edit a budget in state
-  //   budgetEdited(state, action) {
-  //     const {
-  //       id,
-  //       name,
-  //       estimatedRevenue,
-  //       categories,
-  //       users,
-  //       transactions = [],
-  //     } = action.payload;
-  //     const foundBudget = state.find((budget) => budget.id === id);
-  //     if (foundBudget) {
-  //       foundBudget.name = name;
-  //       foundBudget.estimatedRevenue = estimatedRevenue;
-  //       foundBudget.categories = categories;
-  //       foundBudget.users = users;
-  //       foundBudget.overbudget = calculateOverbudget(foundBudget, transactions);
-  //     }
-  //   },
-  //   // Action to remove a budget from state
-  //   budgetRemoved(state, action) {
-  //     const { id } = action.payload;
-  //     return state.filter((budget) => budget.id !== id);
-  //   },
-  //   // Load initial budgets from the start so higher-level pages have access to budget alerts instead of needing to visit budget details first
-  //   loadBudgets(state, action) {
-  //     return action.payload.budgets.map((budget) => ({
-  //       ...budget,
-  //       overbudget: calculateOverbudget(budget, action.payload.transactions),
-  //     }));
-  //   },
-  // },
-  reducers: {},
+  reducers: {
+    // Action to add a budget to state
+    budgetAdd(state, action) {
+      state.push(action.payload);
+    },
+    // Action to edit a budget in state
+    budgetEdited(state, action) {
+      const {
+        id,
+        name,
+        estimatedRevenue,
+        categories,
+        users,
+        transactions = [],
+      } = action.payload;
+      const foundBudget = state.find((budget) => budget.id === id);
+      if (foundBudget) {
+        foundBudget.name = name;
+        foundBudget.estimatedRevenue = estimatedRevenue;
+        foundBudget.categories = categories;
+        foundBudget.users = users;
+        foundBudget.overbudget = calculateOverbudget(foundBudget, transactions);
+      }
+    },
+    // Action to remove a budget from state
+    budgetRemoved(state, action) {
+      const { id } = action.payload;
+      return state.filter((budget) => budget.id !== id);
+    },
+    // Load initial budgets from the start so higher-level pages have access to budget alerts instead of needing to visit budget details first
+    loadBudgets(state, action) {
+      return action.payload.budgets.map((budget) => ({
+        ...budget,
+        overbudget: calculateOverbudget(budget, action.payload.transactions),
+      }));
+    },
+  },
+  // reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchBudgets.fulfilled, (state, action) => {
